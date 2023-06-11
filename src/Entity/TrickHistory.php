@@ -42,7 +42,7 @@ class TrickHistory
     #[ORM\JoinColumn(nullable: false)]
     private ?GroupTrick $groupTrick = null;
 
-    #[ORM\ManyToOne(inversedBy: 'trickHistories')]
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $author = null;
 
