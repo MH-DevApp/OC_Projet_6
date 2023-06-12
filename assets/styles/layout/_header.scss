@@ -1,0 +1,27 @@
+header {
+  nav {
+    height: 100px;
+    background-color: var(--primary);
+    padding: 0 !important;
+    box-shadow: var(--box-shadow);
+
+    a.navbar-brand {
+      color: var(--text-light) !important;
+      font-weight: bold;
+      align-self: flex-end;
+      text-shadow: var(--gray) 1px 1px 3px;
+      padding: 0 !important;
+      img {
+        height: 80px;
+        width: 90px;
+        box-shadow: var(--box-shadow);
+        border-radius: 50%;
+      }
+    }
+
+    a:hover span {
+      text-decoration: underline !important;
+    }
+
+  }
+}
