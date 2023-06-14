@@ -1,0 +1,14 @@
+.notifications {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  position: absolute;
+  bottom: 110px;
+  right: 10px;
+
+  div.alert {
+    display: flex;
+    justify-content: center;
+    max-width: 50vw;
+  }
+}

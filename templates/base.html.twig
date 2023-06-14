@@ -17,6 +17,16 @@
         {% include 'layout/header.html.twig' %}
 
         <div class="body flex-fill">
+            <div class="notifications">
+                {% for cat, list in app.flashes %}
+                    {% for message in list %}
+                        <div class="alert alert-{{ cat }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <span type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></span>
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+            </div>
             {% block body %}{% endblock %}
         </div>
 
