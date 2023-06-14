@@ -37,13 +37,9 @@ class SecurityAuthenticator extends AbstractLoginFormAuthenticator
 
         return new Passport(
             new UserBadge($username, function($userIdentifier) {
-                $url = $this->urlGenerator->generate("app_auth_email_refresh_link");
                 $user = $this->entityManager->getRepository(User::class)->findOneBy(['username' => $userIdentifier]);
                 if (!$user->isStatus()) {
-                    throw new CustomUserMessageAuthenticationException(
-                        "Votre email n'a pas encore été confirmé.
-                         Si vous n'avez plus le lien de confirmation reçu par mail lors de votre inscription, veuillez cliquer sur ce <a class='link-primary' href='".$url."'>lien</a>."
-                    );
+                    throw new CustomUserMessageAuthenticationException("ConfirmationEmail");
                 }
                 return $user;
             }),
