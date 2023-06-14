@@ -11,7 +11,7 @@
                     {{ form_start(form) }}
                     {{ form_rest(form) }}
                     <div class="d-flex justify-content-between align-items-center">
-                        <a class="link-primary" href="#">Déjà un compte ?</a>
+                        <a class="link-primary" href="{{ path("app_auth_login") }}">Déjà un compte ?</a>
                         <input class="btn btn-primary" type="submit" value="S'inscrire" />
                     </div>
                     {{ form_end(form) }}
