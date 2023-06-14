@@ -7,11 +7,14 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\UuidV6;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[UniqueEntity("email", message: "Cette adresse email est déjà utilisée.")]
+#[UniqueEntity("username", message: "Ce nom d'utilisateur est déjà utilisé.")]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -36,7 +39,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $picture = null;
 
     #[ORM\Column]
-    private ?bool $status = null;
+    private ?bool $status = false;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
