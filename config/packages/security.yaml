@@ -9,7 +9,7 @@ security:
         app_user_provider:
             entity:
                 class: App\Entity\User
-                property: email
+                property: username
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -17,6 +17,12 @@ security:
         main:
             lazy: true
             provider: app_user_provider
+            custom_authenticator: App\Security\SecurityAuthenticator
+            logout:
+                path: app_auth_logout
+                target: home
+                # where to redirect after logout
+                # target: app_any_route
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
