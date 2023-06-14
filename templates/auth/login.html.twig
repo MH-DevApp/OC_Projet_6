@@ -33,7 +33,7 @@
                            value="{{ csrf_token('authenticate') }}"
                     >
                     <div class="d-flex justify-content-between align-items-center">
-                        <a class="link-primary" href="#">Mot de passe perdu ?</a>
+                        <a class="link-primary" href="{{ path("app_auth_forgotten_password") }}">Mot de passe perdu ?</a>
                         <input class="btn btn-primary" type="submit" value="Se connecter" />
                     </div>
                 </form>
