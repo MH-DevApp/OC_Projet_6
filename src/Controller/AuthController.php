@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
-use App\Form\RefreshConfirmEmailType;
+use App\Form\EmailFormType;
 use App\Form\RegisterType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
@@ -178,7 +178,7 @@ class AuthController extends AbstractController
         MailerInterface $mailer,
         CsrfTokenManagerInterface $csrfTokenManager
     ): Response {
-        $form = $this->createForm(RefreshConfirmEmailType::class);
+        $form = $this->createForm(EmailFormType::class);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -223,6 +223,13 @@ class AuthController extends AbstractController
         ]);
     }
 
+    /**
+     * Login form
+     *
+     * @param AuthenticationUtils $authenticationUtils
+     *
+     * @return Response
+     */
     #[Route(path: '/auth/login', name: 'app_auth_login', methods: ['GET', 'POST'])]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
@@ -245,5 +252,76 @@ class AuthController extends AbstractController
     public function logout(): void
     {
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
+    }
+
+    /**
+     * Forgotten Password form
+     *
+     * @param Request $request
+     * @param EntityManagerInterface $em
+     * @param MailerInterface $mailer
+     * @param CsrfTokenManagerInterface $csrfTokenManager
+     *
+     * @return Response
+     *
+     * @throws TransportExceptionInterface
+     */
+    #[Route(
+        path: '/auth/forgotten-password',
+        name: 'app_auth_forgotten_password',
+        methods: ['GET', 'POST']
+    )]
+    public function forgottenPassword(
+        Request $request,
+        EntityManagerInterface $em,
+        MailerInterface $mailer,
+        CsrfTokenManagerInterface $csrfTokenManager
+    ): Response
+    {
+        $form = $this->createForm(EmailFormType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $user = $em->getRepository(User::class)->findOneBy([
+                'email' => $form->get('email')->getData(),
+            ]);
+
+            if ($user) {
+                $token = uniqid('tk_');
+                $hash = $csrfTokenManager->getToken($token)->getValue();
+                $url = "https://localhost:3000/auth/forgotten-password/reset/"
+                    . $user->getUsername()
+                    . "_"
+                    . $token;
+
+                $user
+                    ->setForgottenToken($hash)
+                    ->setForgottenExpiredAt(new \DateTimeImmutable("+5 minutes"));
+
+                $em->flush();
+
+                $email = (new TemplatedEmail())
+                    ->to($user->getEmail())
+                    ->subject("[P6] Snowtricks - Reinitialisation de votre mot de passe !")
+                    ->htmlTemplate("emails/forgotten-password.html.twig")
+                    ->context([
+                        "username" => $user->getUsername(),
+                        "url" => $url
+                    ]);
+
+                $mailer->send($email);
+
+                $this->addFlash(
+                    'success',
+                    'Un lien de réinitialisation de votre mot de passe a bien été envoyé.'
+                );
+
+                return $this->redirectToRoute('home');
+            }
+        }
+
+        return $this->render("auth/forgotten-password.html.twig", [
+            "form" => $form->createView(),
+        ]);
     }
 }
