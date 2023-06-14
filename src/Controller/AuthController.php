@@ -241,7 +241,7 @@ class AuthController extends AbstractController
         ]);
     }
 
-    #[Route(path: '/auth/logout', name: 'app_auth_logout')]
+    #[Route(path: '/auth/logout', name: 'app_auth_logout', methods: ['GET'])]
     public function logout(): void
     {
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
