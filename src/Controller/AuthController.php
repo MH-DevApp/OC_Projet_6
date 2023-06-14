@@ -33,7 +33,7 @@ class AuthController extends AbstractController
      *
      * @throws TransportExceptionInterface
      */
-    #[Route('/auth/register', name: 'app_auth_register')]
+    #[Route('/auth/register', name: 'app_auth_register', methods: ["GET", "POST"])]
     public function register(
         Request $request,
         UserPasswordHasherInterface $passwordHasher,
@@ -115,7 +115,12 @@ class AuthController extends AbstractController
      *
      * @throws TransportExceptionInterface
      */
-    #[Route('/auth/email-confirmation/{username}_{token}', name: 'app_auth_email_confirmation', requirements: ["username" => "[a-zA-Z0-9]+", "token" => "(tk_){1}[a-z0-9]+"])]
+    #[Route(
+        '/auth/email-confirmation/{username}_{token}',
+        name: 'app_auth_email_confirmation',
+        requirements: ["username" => "[a-zA-Z0-9]+", "token" => "(tk_){1}[a-z0-9]+"],
+        methods: ["GET"]
+    )]
     public function emailConfirmation(
         ?string $username,
         ?string $token,
@@ -185,7 +190,11 @@ class AuthController extends AbstractController
      * @return Response
      * @throws TransportExceptionInterface
      */
-    #[Route('/auth/email-refresh-link', name: 'app_auth_email_refresh_link')]
+    #[Route(
+        '/auth/email-refresh-link',
+        name: 'app_auth_email_refresh_link',
+        methods: ["GET", "POST"]
+    )]
     public function emailRefreshLink(
         Request $request,
         EntityManagerInterface $em,
