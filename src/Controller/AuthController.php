@@ -5,9 +5,11 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\EmailFormType;
 use App\Form\RegisterType;
+use App\Form\ResetPasswordType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormError;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -289,10 +291,10 @@ class AuthController extends AbstractController
             if ($user) {
                 $token = uniqid('tk_');
                 $hash = $csrfTokenManager->getToken($token)->getValue();
-                $url = "https://localhost:3000/auth/forgotten-password/reset/"
-                    . $user->getUsername()
-                    . "_"
-                    . $token;
+                $url = $this->generateUrl("app_auth_forgotten_password_reset", [
+                        "username" => $user->getUsername(),
+                        "token" => $token
+                    ], UrlGeneratorInterface::ABSOLUTE_URL);
 
                 $user
                     ->setForgottenToken($hash)
@@ -323,5 +325,106 @@ class AuthController extends AbstractController
         return $this->render("auth/forgotten-password.html.twig", [
             "form" => $form->createView(),
         ]);
+    }
+
+    /**
+     * Forgotten Password form
+     *
+     * @param string|null $username
+     * @param string|null $token
+     * @param Request $request
+     * @param EntityManagerInterface $em
+     * @param MailerInterface $mailer
+     * @param CsrfTokenManagerInterface $csrfTokenManager
+     * @param UserPasswordHasherInterface $passwordHasher
+     *
+     * @return Response
+     *
+     * @throws TransportExceptionInterface
+     */
+    #[Route(
+        path: '/auth/forgotten-password/reset/{username}_{token}',
+        name: 'app_auth_forgotten_password_reset',
+        methods: ['GET', 'POST']
+    )]
+    public function forgottenPasswordReset(
+        ?string $username,
+        ?string $token,
+        Request $request,
+        EntityManagerInterface $em,
+        MailerInterface $mailer,
+        CsrfTokenManagerInterface $csrfTokenManager,
+        UserPasswordHasherInterface $passwordHasher
+    ): Response
+    {
+        $user = null;
+
+        if ($username) {
+            $user = $em->getRepository(User::class)->findOneBy([
+                'username' => $username,
+            ]);
+        }
+
+        if (!$user) {
+            throw $this->createNotFoundException("La page n'a pas été trouvée.");
+        }
+
+        if (
+            new \DateTimeImmutable('now') < $user->getForgottenExpiredAt() &&
+            $csrfTokenManager->isTokenValid(new CsrfToken($token, $user->getForgottenToken()))
+        ) {
+            $form = $this->createForm(ResetPasswordType::class);
+            $form->handleRequest($request);
+
+            if ($form->isSubmitted() && $form->isValid()) {
+                $user
+                    ->setPassword(
+                        $passwordHasher->hashPassword(
+                            $user,
+                            $form->get('repeatedPassword')->getData()
+                        )
+                    )
+                    ->setForgottenToken(null)
+                    ->setForgottenExpiredAt(null)
+                ;
+
+                $em->flush();
+
+                $url = $this->generateUrl(
+                    "app_auth_login", referenceType:
+                    UrlGeneratorInterface::ABSOLUTE_URL
+                );
+
+                $email = (new TemplatedEmail())
+                    ->to($user->getEmail())
+                    ->subject("[P6] Snowtricks - Mot de passe réinitialisé !")
+                    ->htmlTemplate("emails/reset-password-successful.html.twig")
+                    ->context([
+                        "username" => $user->getUsername(),
+                        "url" => $url
+                    ]);
+
+                $mailer->send($email);
+
+                $this->addFlash(
+                    "success",
+                    "Votre mot de passe a bien été réinitialisé."
+                );
+
+                return $this->redirectToRoute("home");
+            }
+
+            return $this->render("auth/forgotten-password-reset.html.twig", [
+                "form" => $form->createView()
+            ]);
+        }
+
+
+        $this->addFlash(
+            'warning',
+            "Le lien de réinitalisation de votre mot de passe n'est plus valide, suivez de nouveau la procédure de réinitialisation de votre mot de passe."
+        );
+
+        return $this->redirectToRoute("app_auth_forgotten_password");
     }
 }
