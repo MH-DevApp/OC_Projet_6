@@ -1,4 +1,44 @@
+import { constructModalConfirm } from "./utils/confirm.js";
+
 window.addEventListener("DOMContentLoaded", () => {
+
+    // AVATAR
+
+    const formAvatar = document.querySelector("form[name='profile_avatar']");
+    const inputFileAvatar = formAvatar.querySelector("input#profile_avatar_avatar");
+    const btnEditAvatar = document.querySelector("div.avatar button#avatar_edit");
+    const btnDeleteAvatar = document.querySelector("div.avatar button#avatar_delete");
+
+    btnEditAvatar.addEventListener("click", () => {
+        inputFileAvatar.click();
+    });
+
+    inputFileAvatar.addEventListener("change", () => {
+        formAvatar.submit();
+    });
+
+    if (btnDeleteAvatar) {
+        btnDeleteAvatar.addEventListener("click", () => {
+            const deleteAvatar = () => {
+                const formDeleteAvatar = document.createElement("form");
+                formDeleteAvatar.action = "/profile/avatar/delete";
+                formDeleteAvatar.method = "POST";
+
+                document.querySelector("div.body").append(formDeleteAvatar);
+
+                formDeleteAvatar.submit();
+            }
+
+            const modalConfirmDeleteAvatar = constructModalConfirm(
+                "Êtes-vous sûr de vouloir supprimer votre avatar ?",
+                deleteAvatar
+            );
+
+            modalConfirmDeleteAvatar.show();
+        });
+    }
+
+
     // CONTAINER PROFILE INFOS
     const containerFormInfos = document.getElementById("containerFormInfos");
     const containerShowInfos = document.getElementById("containerShowInfos");
