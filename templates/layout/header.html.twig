@@ -17,7 +17,7 @@
                 </a>
                 <span class="text-light">|</span>
                 {% if app.user %}
-                    <a class="link-light" href="#">
+                    <a class="link-light" href="{{ path('app_profile') }}">
                         <i class="fa-solid fa-address-card"></i>
                         <span class="ps-1">Profil</span>
                     </a>
@@ -48,14 +48,14 @@
             <i class="fa-solid fa-circle-plus"></i>
         </a>
         {% if app.user %}
-            <a class="link-light" href="#" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Profil">
+            <a class="link-light" href="{{ path('app_profile') }}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Profil">
                 <i class="fa-solid fa-address-card"></i>
             </a>
             <a class="link-light" href="{{ path("app_auth_logout") }}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Se déconnecter">
                 <i class="fa-solid fa-right-to-bracket" style="rotate: -180deg"></i>
             </a>
         {% else %}
-            <a class="link-light" href="#" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Inscription">
+            <a class="link-light" href="{{ path('app_auth_register') }}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Inscription">
                 <i class="fa-solid fa-user-plus"></i>
             </a>
             <a class="link-light" href="{{ path('app_auth_login') }}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Se connecter">
