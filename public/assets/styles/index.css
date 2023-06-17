@@ -50,11 +50,16 @@ a {
   color: var(--danger);
 }
 
+.bg-primary-1 {
+  background-color: var(--primary);
+  color: var(--bs-light);
+}
+
 .notifications {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  position: absolute;
+  position: fixed;
   bottom: 110px;
   right: 10px;
 }

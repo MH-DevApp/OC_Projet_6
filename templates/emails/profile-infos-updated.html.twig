@@ -1,0 +1,68 @@
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport"
+              content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Modification des informations personnelles</title>
+    </head>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .email-container {
+            max-width: 800px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .email-header {
+            text-align: center;
+            background-color: #1f9ade;
+            color: #ececec;
+            width: 100%;
+            border: 1px solid #1f9ade;
+            padding: 10px 20px;
+            margin-top: 0;
+            border-radius: 5px 5px 0 0;
+            text-transform: uppercase;
+        }
+
+        .email-body {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 10px 20px;
+            border: 1px solid #1f9ade;
+            border-radius: 0 0 5px 5px;
+            width: 100%;
+        }
+    </style>
+    <body>
+        <div class="email-container">
+            <div class="email-header">
+                <h1>Vos informations personnelles modifiées</h1>
+            </div>
+            <div class="email-body">
+                <p>
+                    Bonjour {{ newUsername|capitalize }},<br><br>
+
+                    Nous vous informons de la prise en compte de la modification de vos informations personnelles :
+                    <ul>
+                        <li>Username : {{ newUsername|capitalize }}</li>
+                        <li>Email : {{ newEmail }}</li>
+                    </ul>
+                    Si vous n'êtes pas à l'origine de cette modification, merci de nous contacter par email : contact@p6-daps-oc.fr.<br><br>
+
+                    Cordialement, <br>
+                    La team Snowtricks
+                </p>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,7 +1,8 @@
 @use "variables";
 @use "reset";
 @use "form";
+@use "utils";
 @use "utils/notification";
 
-@use "layout/_header";
-@use "layout/_footer";
+@use "layout/header";
+@use "layout/footer";

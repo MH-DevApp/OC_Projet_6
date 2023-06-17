@@ -7,6 +7,7 @@ use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
 use Symfony\Component\Validator\Constraints\Length;
 
 class ResetPasswordType extends AbstractType
@@ -27,7 +28,12 @@ class ResetPasswordType extends AbstractType
                     "attr" => [
                         "class" => "form-control"
                     ],
-                    "required" => true
+                    "required" => true,
+                    "constraints" => [
+                        new UserPassword([
+                            "message" => "Le mot de passe actuel est incorrect."
+                        ])
+                    ]
                 ]);
         }
 
@@ -78,7 +84,7 @@ class ResetPasswordType extends AbstractType
         $resolver->setDefaults([
             // Configure your form options here
             'attr' => [
-                "class" => "w-100 shadow p-3 mb-5 rounded"
+                "class" => "w-100 shadow p-3 rounded"
             ]
         ]);
     }
