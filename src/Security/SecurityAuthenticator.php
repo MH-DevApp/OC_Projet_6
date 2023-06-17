@@ -38,7 +38,7 @@ class SecurityAuthenticator extends AbstractLoginFormAuthenticator
         return new Passport(
             new UserBadge($username, function($userIdentifier) {
                 $user = $this->entityManager->getRepository(User::class)->findOneBy(['username' => $userIdentifier]);
-                if (!$user->isStatus()) {
+                if ($user && !$user->isStatus()) {
                     throw new CustomUserMessageAuthenticationException("ConfirmationEmail");
                 }
                 return $user;
