@@ -46,6 +46,11 @@ a {
   cursor: pointer;
 }
 
+textarea {
+  resize: none;
+  height: 300px;
+}
+
 .form-error {
   color: var(--danger);
 }

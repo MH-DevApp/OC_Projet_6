@@ -4,7 +4,10 @@ namespace App\Repository;
 
 use App\Entity\Trick;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\Uid\UuidV6;
 
 /**
  * @extends ServiceEntityRepository<Trick>
@@ -37,6 +40,28 @@ class TrickRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    /**
+     * @throws NonUniqueResultException
+     * @throws NoResultException
+     */
+    public function getCountTricksBySlugNotEqualWithId(string $slug, ?UuidV6 $id): int
+    {
+        $qb = $this->createQueryBuilder('t')
+            ->select("COUNT(t)")
+            ->where('t.slug = :slug')
+            ->setParameter('slug', $slug);
+
+        if ($id) {
+            $qb
+                ->andWhere('t.id != :id')
+                ->setParameter('id', UuidV6::fromString($id)->toBinary());
+        }
+
+        return $qb
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 
 }

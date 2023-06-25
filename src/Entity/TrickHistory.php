@@ -31,18 +31,18 @@ class TrickHistory
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?MediaTrick $pictureFeatured = null;
 
-    #[ORM\ManyToMany(targetEntity: MediaTrick::class, inversedBy: 'trickHistories')]
+    #[ORM\ManyToMany(targetEntity: MediaTrick::class, inversedBy: 'trickHistories', cascade: ['persist', 'remove'])]
     private Collection $mediasTrick;
 
-    #[ORM\ManyToOne(inversedBy: 'trickHistories')]
+    #[ORM\ManyToOne(cascade: ['persist'], inversedBy: 'trickHistories')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Trick $trick = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false)]
     private ?GroupTrick $groupTrick = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $author = null;
 

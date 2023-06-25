@@ -8,9 +8,11 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\IdGenerator\UuidGenerator;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Uid\UuidV6;
 
 #[ORM\Entity(repositoryClass: TrickRepository::class)]
+#[UniqueEntity("name", message: "Le nom de cette figure est déjà utilisé.")]
 class Trick
 {
     #[ORM\Id]
@@ -27,6 +29,10 @@ class Trick
 
     #[ORM\Column(length: 255, unique: true)]
     private ?string $slug = null;
+
+
+    #[ORM\Column]
+    private ?bool $isPublished = false;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
@@ -45,13 +51,13 @@ class Trick
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     private ?MediaTrick $pictureFeatured = null;
 
-    #[ORM\OneToMany(mappedBy: 'trick', targetEntity: TrickHistory::class)]
+    #[ORM\OneToMany(mappedBy: 'trick', targetEntity: TrickHistory::class, cascade: ['persist', 'remove'])]
     private Collection $trickHistories;
 
-    #[ORM\OneToMany(mappedBy: 'trick', targetEntity: MediaTrick::class)]
+    #[ORM\OneToMany(mappedBy: 'trick', targetEntity: MediaTrick::class, cascade: ['persist', 'remove'])]
     private Collection $mediaTricks;
 
-    #[ORM\OneToMany(mappedBy: 'trick', targetEntity: Comment::class)]
+    #[ORM\OneToMany(mappedBy: 'trick', targetEntity: Comment::class, cascade: ['persist', 'remove'])]
     private Collection $comments;
 
     public function __construct()
@@ -102,6 +108,18 @@ class Trick
         return $this;
     }
 
+    public function isPublished(): ?bool
+    {
+        return $this->isPublished;
+    }
+
+    public function setIsPublished(string $isPublished): self
+    {
+        $this->isPublished = $isPublished;
+
+        return $this;
+    }
+
     public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
@@ -131,7 +149,7 @@ class Trick
         return $this->author;
     }
 
-    public function setAuthor(?User $author): static
+    public function setAuthor(?User $author): self
     {
         $this->author = $author;
 
@@ -158,6 +176,9 @@ class Trick
     public function setPictureFeatured(?MediaTrick $pictureFeatured): self
     {
         $this->pictureFeatured = $pictureFeatured;
+        if ($pictureFeatured && $this->pictureFeatured->getTrick() !== $this) {
+            $this->pictureFeatured->setTrick($this);
+        }
 
         return $this;
     }
@@ -170,7 +191,7 @@ class Trick
         return $this->trickHistories;
     }
 
-    public function addTrickHistory(TrickHistory $trickHistory): static
+    public function addTrickHistory(TrickHistory $trickHistory): self
     {
         if (!$this->trickHistories->contains($trickHistory)) {
             $this->trickHistories->add($trickHistory);
@@ -180,7 +201,7 @@ class Trick
         return $this;
     }
 
-    public function removeTrickHistory(TrickHistory $trickHistory): static
+    public function removeTrickHistory(TrickHistory $trickHistory): self
     {
         if ($this->trickHistories->removeElement($trickHistory)) {
             // set the owning side to null (unless already changed)
@@ -197,10 +218,15 @@ class Trick
      */
     public function getMediaTricks(): Collection
     {
-        return $this->mediaTricks;
+        return new ArrayCollection(array_filter(
+            $this->mediaTricks->toArray(),
+            function(MediaTrick $mediaTrick) {
+                return $this->getPictureFeatured() !== $mediaTrick;
+            }
+        ));
     }
 
-    public function addMediaTrick(MediaTrick $mediaTrick): static
+    public function addMediaTrick(MediaTrick $mediaTrick): self
     {
         if (!$this->mediaTricks->contains($mediaTrick)) {
             $this->mediaTricks->add($mediaTrick);
@@ -210,7 +236,7 @@ class Trick
         return $this;
     }
 
-    public function removeMediaTrick(MediaTrick $mediaTrick): static
+    public function removeMediaTrick(MediaTrick $mediaTrick): self
     {
         if ($this->mediaTricks->removeElement($mediaTrick)) {
             // set the owning side to null (unless already changed)
@@ -230,7 +256,7 @@ class Trick
         return $this->comments;
     }
 
-    public function addComment(Comment $comment): static
+    public function addComment(Comment $comment): self
     {
         if (!$this->comments->contains($comment)) {
             $this->comments->add($comment);
@@ -240,7 +266,7 @@ class Trick
         return $this;
     }
 
-    public function removeComment(Comment $comment): static
+    public function removeComment(Comment $comment): self
     {
         if ($this->comments->removeElement($comment)) {
             // set the owning side to null (unless already changed)

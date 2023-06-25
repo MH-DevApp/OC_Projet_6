@@ -19,7 +19,7 @@ abstract class FileManager {
      *
      * @throws Exception
      */
-    public static function uploadFile(UploadedFile $file, string $folder, string $oldFileName = null): string
+    public static function uploadFile(UploadedFile $file, string $folder, ?string $oldFileName = null): string
     {
         $ext = $file->guessExtension() ?? 'bin';
         $filename = bin2hex(random_bytes(10)) . "." . $ext;
