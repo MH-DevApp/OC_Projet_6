@@ -34,10 +34,10 @@ class MediaTrick
     #[ORM\Column]
     private ?\DateTimeImmutable $addedAt = null;
 
-    #[ORM\ManyToMany(targetEntity: TrickHistory::class, mappedBy: 'mediasTrick')]
+    #[ORM\ManyToMany(targetEntity: TrickHistory::class, mappedBy: 'mediasTrick', cascade: ['persist'])]
     private Collection $trickHistories;
 
-    #[ORM\ManyToOne(inversedBy: 'mediaTricks')]
+    #[ORM\ManyToOne(cascade: ['persist'], inversedBy: 'mediaTricks')]
     private ?Trick $trick = null;
 
     public function __construct()
