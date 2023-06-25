@@ -11,7 +11,7 @@
                     <span class="ps-1">Accueil</span>
                 </a>
                 <span class="text-light">|</span>
-                <a class="link-light" href="#">
+                <a class="link-light" href="{{ path("app_trick_add") }}">
                     <i class="fa-solid fa-circle-plus"></i>
                     <span class="ps-1">Figure</span>
                 </a>
@@ -44,7 +44,7 @@
         <a class="link-light" href="{{ path("home") }}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Accueil">
             <i class="fa-solid fa-house"></i>
         </a>
-        <a class="link-light" href="#" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Ajouter une figure">
+        <a class="link-light" href="{{ path("app_trick_add") }}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Ajouter une figure">
             <i class="fa-solid fa-circle-plus"></i>
         </a>
         {% if app.user %}
