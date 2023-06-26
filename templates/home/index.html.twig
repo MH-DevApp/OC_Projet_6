@@ -2,6 +2,100 @@
 
 {% block title %}Page d'accueil{% endblock %}
 
-{% block body %}
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset("assets/styles/homepage.css") }}" />
+{% endblock %}
 
+{% block body %}
+    <div id="carouselCatchPhrase" class="carousel carousel-dark slide d-flex border-bottom border-top border-3 border-warning position-relative" data-bs-ride="carousel">
+        <div class="carousel-inner h-100">
+            <div class="carousel-item active h-100" data-bs-interval="5000">
+                <div class="bg-dark bg-opacity-25 w-100 h-100 position-absolute top-0 start-0"></div>
+                <img
+                    src="{{ asset("assets/images/static/catch-phrase-1.jpg") }}"
+                    class="d-block h-100 w-100"
+                    alt="image catch phrase 1"
+                >
+                <div class="carousel-caption d-none d-md-block text-light bg-dark shadow bg-opacity-75 mb-5">
+                    <h5 class="p-3">
+                        Rejoignez la communauté des riders passionnés de snowboard et partagez vos
+                        tricks les plus impressionnants dans notre site dédié aux figures de snowboard !
+                    </h5>
+                </div>
+            </div>
+            <div class="carousel-item h-100" data-bs-interval="5000">
+                <div class="bg-dark bg-opacity-25 w-100 h-100 position-absolute top-0 start-0"></div>
+                <img
+                    src="{{ asset("assets/images/static/catch-phrase-2.jpg") }}"
+                    class="d-block h-100 w-100"
+                    alt="image catch phrase 2"
+                >
+                <div class="carousel-caption d-none d-md-block text-light bg-dark shadow bg-opacity-75 mb-5">
+                    <h5 class="p-3">
+                        Explorez un univers de créativité et d'innovation avec notre communauté en ligne
+                        dédiée aux figures de snowboard. Partagez, inspirez et progressez ensemble !
+                    </h5>
+                </div>
+            </div>
+            <div class="carousel-item h-100" data-bs-interval="5000">
+                <div class="bg-dark bg-opacity-25 w-100 h-100 position-absolute top-0 start-0"></div>
+                <img
+                    src="{{ asset("assets/images/static/catch-phrase-3.jpg") }}"
+                    class="d-block h-100 w-100"
+                    alt="image catch phrase 3"
+                >
+                <div class="carousel-caption d-none d-md-block text-light bg-dark shadow bg-opacity-75 mb-5">
+                    <h5 class="p-3">
+                        Plongez dans l'univers fascinant des figures de snowboard avec notre site communautaire où
+                        vous pourrez échanger, apprendre et repousser vos limites avec d'autres riders passionnés.
+                    </h5>
+                </div>
+            </div>
+        </div>
+        <div class="position-absolute bottom-0 end-0 m-2 mb-5 p-2 px-3 bg-dark text-light rounded">
+            <a class="link-light" href="#containerTricks">
+                <i class="fas fa-arrow-down"></i>
+            </a>
+        </div>
+    </div>
+    <div id="containerTricks" class="container">
+        <div class="row p-0 m-0 mt-2 h-100 w-100 justify-content-start align-items-center">
+            {% if tricks|length %}
+{#                {% for index in range(0,14) %}#}
+                    {% for trick in tricks %}
+                        <div class="col-12 col-sm-4 col-lg-3 col-xl-2 mx-3 my-1 p-0">
+                            <article class="card d-flex rounded-0">
+                                {% set
+                                    linkMedia = trick.pictureFeatured ?
+                                    trick.pictureFeatured.link :
+                                    "default-picture.png"
+                                %}
+                                <img src="{{ asset("assets/images/tricks/" ~ linkMedia) }}" class="card-img-top rounded-0" alt="...">
+                                <div class="card-body d-flex justify-content-between px-2 py-3">
+                                    <div class="card-text">
+                                        <a class="link-primary" href="#">{{ trick.name }}</a>
+                                    </div>
+                                    <div class="card-text d-flex flex-row flex-nowrap">
+                                        <a class="btn btn-primary btn-sm me-1" href="#">
+                                            <i class="fas fa-pen"></i>
+                                        </a>
+                                        <a class="btn btn-danger btn-sm" href="#">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    {% endfor %}
+{#                {% endfor %}#}
+            {% else %}
+                <div class="col-12">
+                    <p class="text-center">
+                        <span>Snowtricks n'a aucune figure à vous présenter pour le moment, soyez le premier à </span>
+                        <a href="{{ path('app_trick_add') }}" class="link-primary">créer une figure</a>
+                    </p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
 {% endblock %}
