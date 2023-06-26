@@ -5,6 +5,7 @@
   position: fixed;
   bottom: 110px;
   right: 10px;
+  z-index: 10000;
 
   div.alert {
     display: flex;
