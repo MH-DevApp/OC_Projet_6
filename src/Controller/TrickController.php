@@ -297,6 +297,7 @@ class TrickController extends AbstractController
             );
         }
 
+
         return $this->redirect(
             $this->generateUrl(
                 "home"
