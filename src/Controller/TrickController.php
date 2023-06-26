@@ -162,31 +162,7 @@ class TrickController extends AbstractController
             return $this->redirectToRoute("home");
         }
 
-        foreach ($trick->getMediaTricks() as $mediaTrick) {
-            if ($mediaTrick->getType() === "image") {
-                FileManager::deleteFile(
-                    $this->getParameter("trick.folder"),
-                    $mediaTrick->getLink()
-                );
-            }
-            $this->em->remove($mediaTrick);
-        }
-
-        if ($trick->getPictureFeatured()) {
-            $pictureFeatured = $trick->getPictureFeatured();
-            FileManager::deleteFile(
-                $this->getParameter("trick.folder"),
-                $pictureFeatured->getLink()
-            );
-            $trick->setPictureFeatured(null);
-            $this->em->remove($pictureFeatured);
-        }
-
-        $this->em->flush();
-
-        $this->em->remove($trick);
-
-        $this->em->flush();
+        $this->deleteTrick($trick);
 
         $this->addFlash(
             "success",
@@ -287,6 +263,77 @@ class TrickController extends AbstractController
         );
 
         return $this->redirectToRoute("app_trick_add");
+    }
+
+    /**
+     * Publish trick
+     *
+     * @param string $slug
+     *
+     * @return Response
+     */
+    #[Route('/trick/delete/{slug}', name: 'app_trick_delete', methods: ['GET'])]
+    public function trickDeleteSlug(
+        string $slug
+    ): Response
+    {
+        $this->denyAccessUnlessGranted("ROLE_USER");
+
+        $trick = $this->em->getRepository(Trick::class)->findOneBy([
+            "slug" => $slug
+        ]);
+
+        if (!$trick) {
+            $this->addFlash(
+                "danger",
+                "La suppression n'a pu aboutir, la figure n'a pas été trouvé."
+            );
+        } else {
+            $this->deleteTrick($trick);
+
+            $this->addFlash(
+                "success",
+                "La figure a été supprimé avec succès."
+            );
+        }
+
+        return $this->redirectToRoute("home");
+    }
+
+    /**
+     * Delete trick
+     *
+     * @param Trick $trick
+     *
+     * @return void
+     */
+    public function deleteTrick(Trick $trick): void
+    {
+        foreach ($trick->getMediaTricks() as $mediaTrick) {
+            if ($mediaTrick->getType() === "image") {
+                FileManager::deleteFile(
+                    $this->getParameter("trick.folder"),
+                    $mediaTrick->getLink()
+                );
+            }
+            $this->em->remove($mediaTrick);
+        }
+
+        if ($trick->getPictureFeatured()) {
+            $pictureFeatured = $trick->getPictureFeatured();
+            FileManager::deleteFile(
+                $this->getParameter("trick.folder"),
+                $pictureFeatured->getLink()
+            );
+            $trick->setPictureFeatured(null);
+            $this->em->remove($pictureFeatured);
+        }
+
+        $this->em->flush();
+
+        $this->em->remove($trick);
+
+        $this->em->flush();
     }
 
     /**
