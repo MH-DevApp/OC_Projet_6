@@ -6,6 +6,10 @@
     <link rel="stylesheet" href="{{ asset("assets/styles/homepage.css") }}" />
 {% endblock %}
 
+{% block javascripts %}
+    <script src="{{ asset("assets/scripts/home.js") }}" type="module"></script>
+{% endblock %}
+
 {% block body %}
     <div id="carouselCatchPhrase" class="carousel carousel-dark slide d-flex border-bottom border-top border-3 border-warning position-relative" data-bs-ride="carousel">
         <div class="carousel-inner h-100">
@@ -79,7 +83,7 @@
                                         <a class="btn btn-primary btn-sm me-1" href="#">
                                             <i class="fas fa-pen"></i>
                                         </a>
-                                        <a class="btn btn-danger btn-sm" href="{{ path("app_trick_delete", { 'slug': trick.slug } ) }}">
+                                        <a data-role=deleteTrick class="btn btn-danger btn-sm" href="{{ path("app_trick_delete", { 'slug': trick.slug } ) }}">
                                             <i class="fas fa-trash"></i>
                                         </a>
                                     </div>
