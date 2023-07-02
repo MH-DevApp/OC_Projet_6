@@ -227,6 +227,32 @@ class TrickController extends AbstractController
     }
 
     /**
+     * Details trick
+     *
+     * @param string $slug
+     *
+     * @return Response
+     */
+    #[Route('/trick/details/{slug}', name: 'app_trick_details', methods: ['GET'])]
+    public function trickDetails(
+        string $slug
+    ): Response
+    {
+        $trick = $this->em->getRepository(Trick::class)->findOneBy([
+            "slug" => $slug,
+            "isPublished" => true
+        ]);
+
+        if (!$trick) {
+            throw $this->createNotFoundException();
+        }
+
+        return $this->render("trick/trick-details.html.twig", [
+            "trick" => $trick
+        ]);
+    }
+
+    /**
      * Publish trick
      *
      * @param string $slug
@@ -266,7 +292,7 @@ class TrickController extends AbstractController
     }
 
     /**
-     * Publish trick
+     * delete trick
      *
      * @param string $slug
      *

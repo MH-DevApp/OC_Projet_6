@@ -1,0 +1,30 @@
+#pictureFeaturedTrick {
+  img {
+    object-position: center;
+    object-fit: contain;
+    max-height: calc(75vh - 100px);
+  }
+}
+
+#containerMedias {
+  overflow-x: auto;
+
+  img {
+    object-fit: cover;
+    height: 150px;
+    width: 200px;
+  }
+
+  iframe {
+    height: 150px;
+    width: 200px;
+  }
+
+  [data-media-trick] {
+    cursor: pointer;
+  }
+}
+
+#containerDescription {
+  text-align: justify;
+}
