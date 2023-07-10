@@ -53,7 +53,7 @@ class MediaTrickType extends AbstractType
                     new Image([
                         "mimeTypes" => ["image/png", "image/jpeg"],
                         "mimeTypesMessage" => "L'extension {{ type }} n'est pas valide.
-                            Les extensions aurotisées sont {{ types }}.",
+                            Les extensions autorisées sont {{ types }}.",
                         "maxSize" => "1M",
                         "maxSizeMessage" => "Votre image fait {{ size }} {{ suffix }}. 
                             La limite autorisée est de {{ limit }} {{ suffix }}.",
