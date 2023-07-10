@@ -3,11 +3,11 @@
 {% block title %}Ajouter des médias{% endblock %}
 
 {% block stylesheets %}
-    <link rel="stylesheet" href="{{ asset("assets/styles/add-trick.css") }}" type="text/css" />
+    <link rel="stylesheet" href="{{ asset("assets/styles/trick.css") }}" type="text/css" />
 {% endblock %}
 
 {% block javascripts %}
-    <script src="{{ asset("assets/scripts/add-trick-medias.js") }}" type="text/javascript"></script>
+    <script src="{{ asset("assets/scripts/trick-medias.js") }}" type="text/javascript"></script>
 
     {% if app.request.method == "POST" %}
         <script type="application/javascript" defer>
