@@ -1,0 +1,245 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Figure {{ trick.name }}{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset("assets/styles/trick.css") }}" type="text/css" />
+    <link rel="stylesheet" href="{{ asset("assets/styles/trick-details.css") }}" type="text/css" />
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset("assets/scripts/details-trick.js") }}" type="module" defer></script>
+    <script src="{{ asset("assets/scripts/edit-trick.js") }}" type="module" defer></script>
+    <script src="{{ asset("assets/scripts/trick-medias.js") }}" type="text/javascript"></script>
+
+    {% if formMediaTrick.vars.submitted %}
+        <script type="application/javascript" defer>
+            window.addEventListener("DOMContentLoaded", function() {
+                if (document.querySelector("input#media_trick_isFeatured").checked) {
+                    document.querySelector("button[data-role=featured]").click();
+                } else {
+                    document.querySelector("button[data-role=media]").click();
+                }
+            });
+        </script>
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+    <div class="flex-fill d-flex flex-column">
+        <div id="containerActions" class="d-flex justify-content-start container p-3 w-100">
+            <a data-role=deleteTrick class="btn btn-danger btn-sm" href="{{ path("app_trick_delete", { 'slug': trick.slug } ) }}">
+                <i class="fas fa-trash"></i>
+                Supprimer la figure
+            </a>
+        </div>
+        <div data-trick-name="{{ trick.name }}" id="pictureFeaturedTrick" class="d-flex container p-0 justify-content-center w-100 h-100">
+            {% set linkFeatured = null %}
+            {% if trick.pictureFeatured == null %}
+                {% if trick.mediaTricks|filter(media => media.type == "image")|length > 0 %}
+                    {% set linkFeatured = "tricks/" ~ trick.mediaTricks|filter(media => media.type == "image")|first.link %}
+                {% endif %}
+            {% else %}
+                {% set linkFeatured = "tricks/" ~ trick.pictureFeatured.link %}
+            {% endif %}
+            <div data-show class="d-flex position-relative bg-dark bg-opacity-25">
+                {% if linkFeatured %}
+                    <img
+                            data-media="image"
+                            class="shadow w-100 p-1 bg-white"
+                            src="{{ asset("assets/images/" ~ linkFeatured) }}"
+                            alt="image de '{{ trick.pictureFeatured.sourceName ?? "Inconnu" }}' - {{ trick.name }}"
+                    />
+                    <div class="position-absolute bottom-0 w-100 h-100 d-flex align-items-end justify-content-center mb-5">
+                        <h1 class="title-trick-name bg-dark bg-opacity-75 text-white p-2 px-4">{{ trick.name }}</h1>
+                    </div>
+                    <div data-media-source class="{{ trick.pictureFeatured and trick.pictureFeatured.sourceName ? "d-flex" : "d-none"}} position-absolute start-0 bottom-0 w-100 p-1">
+                        <div class="d-flex w-100 gap-2 p-2 link-light bg-dark bg-opacity-75">
+                            <span>Source: </span>
+                            <a class="link-info" href="{{ trick.pictureFeatured.sourceLink ?? '#' }}">{{ trick.pictureFeatured.sourceName ?? "" }}</a>
+                        </div>
+                    </div>
+                {% elseif trick.mediaTricks|filter(media => media.type == "video")|length > 0 %}
+                    <iframe data-media="video" class="shadow p-1 bg-white" src="{{ trick.mediaTricks|filter(media => media.type == "video")|first.link }}" allowfullscreen></iframe>
+                {% else %}
+                    <div class="d-flex flex-column align-items-center default-image justify-content-center p-1 shadow">
+                        <i class="fas fa-image fs-1"></i>
+                        <span class="small">Aucune image</span>
+                    </div>
+                    <div class="position-absolute bottom-0 w-100 h-100 d-flex align-items-end justify-content-center mb-5">
+                        <h1 class="title-trick-name bg-dark bg-opacity-75 text-white p-2 px-4">{{ trick.name }}</h1>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="d-flex justify-content-start container p-3 w-100">
+            <button data-role="media" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#mediaForm">
+                <i class="fas fa-circle-plus"></i>
+                Ajouter un média
+            </button>
+        </div>
+        <div class="d-flex justify-content-center">
+            <button data-role=seeMedias type="button" class="d-block d-sm-none btn btn-sm btn-outline-primary mt-2">Voir les médias</button>
+        </div>
+        <div id="containerMedias" class="d-none d-flex d-sm-flex flex-nowrap container w-100 justify-content-start gap-2 mt-2 p-2">
+            <div class="d-flex flex-column">
+                <div data-media-trick class="d-flex justify-content-center position-relative bg-white bg-opacity-50">
+                    {% if trick.pictureFeatured %}
+                        <img
+                                data-media="image"
+                                class="shadow p-1 bg-warning bg-primary"
+                                src="{{ asset("assets/images/tricks/" ~ trick.pictureFeatured.link ) }}"
+                                alt="image de '{{ trick.pictureFeatured.sourceName ?? "Inconnu" }}' - {{ trick.name }}"
+                        />
+                        <div data-media-source class="{{ trick.pictureFeatured.sourceName ? "d-flex" : "d-none" }} position-absolute start-0 bottom-0 w-100 p-1">
+                            <div class="d-flex w-100 gap-2 p-2 link-light bg-dark bg-opacity-75">
+                                <span>Source: </span>
+                                <a class="link-info" href="{{ trick.pictureFeatured.sourceLink ?? '#' }}">{{ trick.pictureFeatured.sourceName ?? "" }}</a>
+                            </div>
+                        </div>
+                        <i class="fa-solid fa-bookmark position-absolute end-0 top-0 m-2 text-warning fs-2"></i>
+                    {% else %}
+                        <div class="d-flex position-relative align-items-center justify-content-center icon-image p-1 shadow bg-warning">
+                            <div class="d-flex flex-column align-items-center justify-content-center bg-white w-100 h-100">
+                                <i class="fas fa-image fs-1"></i>
+                                <i class="fa-solid fa-bookmark position-absolute end-0 top-0 m-2 text-warning fs-2"></i>
+                                <span class="small">Aucune image mise en avant</span>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="d-flex flex-row gap-1 justify-content-end mt-1 me-1">
+                    {% if trick.pictureFeatured %}
+                        <button
+                            data-role="featured"
+                            data-media-id="{{ trick.pictureFeatured.id }}"
+                            type="button"
+                            class="btn btn-sm btn-primary"
+                            data-bs-toggle="modal"
+                            data-bs-target="#mediaForm"
+                        >
+                            <i class="fas fa-pen"></i>
+                        </button>
+                        <a
+                                data-media-action="delete"
+                                data-media-type="image"
+                                class="btn btn-sm btn-danger"
+                                href="{{ trick.pictureFeatured ? path("app_trick_delete_media", { 'method': "edit", 'id': trick.pictureFeatured.id }) : "#" }}"
+                        >
+                            <i class="fas fa-trash"></i>
+                    </a>
+                    {% else %}
+                        <button
+                                data-role="featured"
+                                type="button"
+                                class="btn btn-sm btn-warning"
+                                data-bs-toggle="modal"
+                                data-bs-target="#mediaForm"
+                        >
+                            <i class="fas fa-circle-plus"></i>
+                            Ajouter
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+            {% for mediaTrick in trick.mediaTricks|filter(mediaTrick => mediaTrick.type == "image") %}
+                <div class="d-flex flex-column">
+                    <div data-media-trick class="d-flex justify-content-center position-relative">
+                        <img
+                                data-media="image"
+                                class="shadow p-1 {{ loop.first and not trick.pictureFeatured ? "bg-primary" : "bg-white" }}"
+                                src="{{ asset("assets/images/tricks/" ~ mediaTrick.link ) }}"
+                                alt="image de '{{ mediaTrick.sourceName ?? "Inconnu" }}' - {{ trick.name }}"
+                        />
+                        <div data-media-source class="{{ mediaTrick.sourceName ? "d-flex" : "d-none" }} position-absolute start-0 bottom-0 w-100">
+                            <div class="d-flex w-100 gap-2 p-2 link-light bg-dark bg-opacity-75">
+                                <span>Source: </span>
+                                <a class="link-info" href="{{ mediaTrick.sourceLink ?? '#' }}">{{ mediaTrick.sourceName }}</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-row gap-1 justify-content-end mt-1 me-1">
+                        <button
+                                data-role="media"
+                                data-media-id="{{ mediaTrick.id }}"
+                                type="button"
+                                class="btn btn-sm btn-primary"
+                                data-bs-toggle="modal"
+                                data-bs-target="#mediaForm"
+                        >
+                            <i class="fas fa-pen"></i>
+                        </button>
+                        <a
+                                data-media-action="delete"
+                                data-media-type="image"
+                                class="btn btn-sm btn-danger"
+                                href="{{ path("app_trick_delete_media", { 'method': "edit", 'id': mediaTrick.id }) }}"
+                        >
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+            {% for mediaTrick in trick.mediaTricks|filter(mediaTrick => mediaTrick.type == "video") %}
+                <div class="d-flex flex-column">
+                    <div
+                            data-media-trick
+                            class="d-flex justify-content-center position-relative"
+                    >
+                        <div
+                                data-media="video"
+                                data-video-link="{{ mediaTrick.link }}"
+                                class="d-flex align-items-center justify-content-center icon-image shadow p-1
+                                {{ loop.first and not trick.pictureFeatured and trick.mediaTricks|filter(mediaTrick => mediaTrick.type == "image")|length == 0 ?
+                                "bg-primary" :
+                                "bg-white"
+                                }}"
+                        >
+                            <div class="d-flex flex-column align-items-center justify-content-center bg-white w-100 h-100">
+                                <i class="fas fa-film fs-1"></i>
+                                <span class="small">Vidéo</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex flex-row gap-1 justify-content-end mt-1 me-1">
+                        <button
+                                data-role="media"
+                                data-media-id="{{ mediaTrick.id }}"
+                                type="button"
+                                class="btn btn-sm btn-primary"
+                                data-bs-toggle="modal"
+                                data-bs-target="#mediaForm"
+                        >
+                            <i class="fas fa-pen"></i>
+                        </button>
+                        <a
+                                data-media-action="delete"
+                                data-media-type="vidéo"
+                                class="btn btn-sm btn-danger"
+                                href="{{ path("app_trick_delete_media", { 'method': "edit", 'id': mediaTrick.id }) }}"
+                        >
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+        <div id="containerInfos" class="container d-flex flex-wrap justify-content-start w-100 gap-3 p-3">
+            <span class="badge bg-dark text-white py-3 px-4">Créé le : {{ trick.createdAt|date("d/m/y") }}</span>
+            <span class="badge bg-dark text-white py-3 px-4">Auteur : {{ trick.author.username }}</span>
+            {% if trick.lastUpdatedAt %}
+                <span class="badge bg-dark text-white py-3 px-4">Modifié le : {{ trick.lastUpdatedAt|date("d/m/y") }}</span>
+            {% endif %}
+        </div>
+        {{ form_start(formTrick, {"attr": {"class": "w-100 p-3 mb-5 rounded container"}}) }}
+        {{ form_rest(formTrick) }}
+        <div class="d-flex w-100 gap-3 justify-content-center justify-content-sm-end align-items-center">
+            <button type="button" id="btnCancelEditTrick" class="d-none btn btn-sm btn-outline-danger">Annuler les modifications</button>
+            <button id="btnSaveTrick" type="submit" class="btn btn-sm btn-primary disabled">Enregistrer</button>
+        </div>
+        {{ form_end(formTrick) }}
+
+        {% include "trick/components/modal-form-add-trick.html.twig" with { 'form': formMediaTrick } %}
+        {% include "trick/components/modal-link-video-infos.html.twig" %}
+    </div>
+{% endblock %}
