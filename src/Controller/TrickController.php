@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\MediaTrick;
 use App\Entity\Trick;
+use App\Entity\TrickHistory;
 use App\Form\MediaTrickType;
 use App\Form\TrickFirstStepType;
 use App\Repository\TrickRepository;
@@ -13,6 +14,8 @@ use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,7 +28,8 @@ class TrickController extends AbstractController
      * Constructor
      */
     public function __construct(
-        private EntityManagerInterface $em
+        private EntityManagerInterface $em,
+        private TrickRepository $trickRepository
     )
     {
     }
@@ -43,8 +47,7 @@ class TrickController extends AbstractController
      */
     #[Route('/trick/add', name: 'app_trick_add', methods: ['GET', 'POST'])]
     public function firstStep(
-        Request $request,
-        TrickRepository $trickRepository
+        Request $request
     ): Response
     {
         $this->denyAccessUnlessGranted("ROLE_USER");
@@ -62,19 +65,7 @@ class TrickController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $slugBase = $this->generateSlug($trick->getName());
-            $slug = $slugBase;
-            $count = 0;
-            while (
-                $trickRepository->getCountTricksBySlugNotEqualWithId(
-                    $slug,
-                    $trick->getId()
-                ) > 0
-            ) {
-                $slug = $slugBase . ($count > 0 ? "-" . $count : "");
-                $count++;
-            }
-
+            $slug = $this->generateSlugTrick($trick);
             $trick
                 ->setAuthor($this->getUser())
                 ->setSlug($slug)
@@ -193,33 +184,71 @@ class TrickController extends AbstractController
             "id" => $id
         ]);
 
-        $trick = $mediaTrick->getTrick();
+        $trick = $mediaTrick->getTrick() ?? null;
+
+        $isFeatured = false;
+
+        if (
+            $trick &&
+            (($method === "add" && $trick->isPublished()) ||
+            ($method === "edit" && !$trick->isPublished()))
+        ) {
+            $this->addFlash(
+                "danger",
+                "Action interdite"
+            );
+
+            return $this->redirectToRoute("home");
+        }
+
+        if ($mediaTrick->getType() === "image") {
+            FileManager::deleteFile(
+                $this->getParameter("trick.folder"),
+                $mediaTrick->getLink()
+            );
+
+            if ($trick->getPictureFeatured() === $mediaTrick) {
+                $trick->setPictureFeatured(null);
+                $isFeatured = true;
+            }
+        }
+
+        $this->em->remove($mediaTrick);
+
+        $this->addFlash(
+            "success",
+            "Le média a été supprimé avec succès."
+        );
 
         if ($method === "add") {
-            if ($trick->isPublished()) {
-                $this->addFlash(
-                    "danger",
-                    "Action interdite"
-                );
-
-                return $this->redirectToRoute("home");
-            }
-
-            if ($mediaTrick->getType() === "image") {
-                FileManager::deleteFile(
-                    $this->getParameter("trick.folder"),
-                    $mediaTrick->getLink()
-                );
-
-                if ($trick->getPictureFeatured() === $mediaTrick) {
-                    $trick->setPictureFeatured(null);
-                }
-            }
-
-            $this->em->remove($mediaTrick);
             $this->em->flush();
 
             return $this->redirectToRoute("app_trick_medias");
+        } else if ($method === "edit") {
+            $trickHistory = new TrickHistory();
+            $trickHistory
+                ->setTrick($trick)
+                ->setAuthor($this->getUser())
+                ->setUpdatedAt(new \DateTimeImmutable("now"));
+
+            if ($isFeatured) {
+                $trickHistory->setIsMediaFeatured(true);
+            }
+
+            if ($mediaTrick->getType() === "image") {
+                $trickHistory->setIsMediaImageDeleted(true);
+            } else {
+                $trickHistory->setIsMediaVideoDeleted(true);
+            }
+
+            $trick->setLastUpdatedAt(new \DateTimeImmutable("now"));
+
+            $this->em->persist($trickHistory);
+            $this->em->flush();
+
+            return $this->redirectToRoute("app_trick_edit", [
+                "slug" => $trick->getSlug()
+            ]);
         }
 
         return $this->redirectToRoute("home");
@@ -249,6 +278,125 @@ class TrickController extends AbstractController
 
         return $this->render("trick/trick-details.html.twig", [
             "trick" => $trick
+        ]);
+    }
+
+    /**
+     * Details trick
+     *
+     * @param string $slug
+     * @param Request $request
+     * @param TrickRepository $trickRepository
+     *
+     * @return Response
+     *
+     * @throws NoResultException
+     * @throws NonUniqueResultException
+     * @throws Exception
+     */
+    #[Route('/trick/edit/{slug}', name: 'app_trick_edit', methods: ['GET', 'POST'])]
+    public function trickEdit(
+        string $slug,
+        Request $request,
+        TrickRepository $trickRepository
+    ): Response
+    {
+        $this->denyAccessUnlessGranted("ROLE_USER");
+
+        $trick = $this->em->getRepository(Trick::class)->findOneBy([
+            "slug" => $slug,
+            "isPublished" => true
+        ]);
+
+        if (!$trick) {
+            throw $this->createNotFoundException();
+        }
+
+        $originalTrick = [
+            "name" => $trick->getName(),
+            "description" => $trick->getDescription(),
+            "groupTrick" => $trick->getGroupTrick(),
+            "pictureFeatured" => $trick->getPictureFeatured(),
+            "mediaTricks" => $trick->getMediaTricks()
+        ];
+
+        $mediaTrick = new MediaTrick();
+        $formMediaTrick = $this->createForm(MediaTrickType::class, $mediaTrick);
+        $formMediaTrick
+            ->add("isEditMediaTrick", CheckboxType::class, [
+                "label" => null,
+                "row_attr" => [
+                    "class" => "d-none mb-3"
+                ],
+                "required" => false,
+                "attr" => [
+                    "class" => "form-check"
+                ],
+                "mapped" => false
+            ])
+            ->add("mediaTrickEdited", TextType::class, [
+                "label" => null,
+                "row_attr" => [
+                    "class" => "d-none mb-3"
+                ],
+                "required" => false,
+                "attr" => [
+                    "class" => "form-control"
+                ],
+                "mapped" => false
+            ]);
+        $formMediaTrick->handleRequest($request);
+
+        if ($formMediaTrick->isSubmitted() && $formMediaTrick->isValid()) {
+            $originalMediaTrick = null;
+
+            if ($formMediaTrick->get("isEditMediaTrick")->getData()) {
+                $originalMediaTrick = $this->em->getRepository(MediaTrick::class)->findOneBy([
+                    "id" => $formMediaTrick->get("mediaTrickEdited")->getData()
+                ]);
+            }
+
+            if ($this->addMedia($formMediaTrick, $originalMediaTrick ?? $mediaTrick, $trick)) {
+                $this->setMediaHistory($formMediaTrick, $trick);
+
+                return $this->redirectToRoute("app_trick_edit", [
+                    "slug" => $trick->getSlug()
+                ]);
+            }
+
+            $this->addFlash(
+                "danger",
+                "Une erreur s'est produite, veuillez réessayer l'opération."
+            );
+        }
+
+        $formTrick = $this->createForm(TrickFirstStepType::class, $trick);
+        $formTrick->handleRequest($request);
+
+        if ($formTrick->isSubmitted() && $formTrick->isValid()) {
+            if (!$this->editTrick($originalTrick, $trick)) {
+                $this->addFlash(
+                    "danger",
+                    "Une erreur s'est produite lors de la modification de la figure '"
+                    . $trick->getName() . "'."
+                );
+                return $this->redirectToRoute("home");
+            }
+
+            $this->addFlash(
+                "success",
+                "La figure a été modifiée avec succès."
+            );
+
+            return $this->redirectToRoute("app_trick_edit", [
+                "slug" => $trick->getSlug()
+            ]);
+        }
+
+        return $this->render("trick/edit-trick.html.twig", [
+            "trick" => $trick,
+            "formMediaTrick" => $formMediaTrick->createView(),
+            "formTrick" => $formTrick->createView()
         ]);
     }
 
@@ -368,6 +516,49 @@ class TrickController extends AbstractController
     }
 
     /**
+     * Function edit trick
+     *
+     * @param array $originalTrick
+     * @param Trick $trick
+     *
+     * @return bool
+     *
+     * @throws NoResultException
+     * @throws NonUniqueResultException
+     */
+    private function editTrick(array $originalTrick, Trick $trick): bool
+    {
+        $trickHistory = new TrickHistory();
+
+        if ($originalTrick["name"] !== $trick->getName()) {
+            $slug = $this->generateSlugTrick($trick);
+            $trick->setSlug($slug);
+            $trickHistory->setIsNameUpdated(true);
+        }
+
+        if ($originalTrick["description"] !== $trick->getDescription()) {
+            $trickHistory->setIsDescriptionUpdated(true);
+        }
+
+        if ($originalTrick["groupTrick"] !== $trick->getGroupTrick()) {
+            $trickHistory->setIsGroupTrickUpdated(true);
+        }
+
+        $trickHistory->setTrick($trick);
+        $trickHistory->setAuthor($this->getUser());
+        $trickHistory->setUpdatedAt(new \DateTimeImmutable("now"));
+        $this->em->persist($trickHistory);
+
+        $trick->setLastUpdatedAt(new \DateTimeImmutable("now"));
+        $trick->addTrickHistory($trickHistory);
+        $this->em->persist($trick);
+
+        $this->em->flush();
+
+        return true;
+    }
+
+    /**
      * @param FormInterface $form
      * @param MediaTrick $mediaTrick
      * @param Trick $trick
@@ -394,6 +585,8 @@ class TrickController extends AbstractController
             if ($form->get("isFeatured")->getData()) {
                 $pictureFeaturedLink = $trick->getPictureFeatured()?->getLink();
                 $mediaTrick = $trick->getPictureFeatured() ?? new MediaTrick();
+            } else {
+                $pictureFeaturedLink = $mediaTrick->getId() ? $mediaTrick->getLink() : null;
             }
 
             $link = FileManager::uploadFile(
@@ -416,6 +609,13 @@ class TrickController extends AbstractController
                 return false;
             }
 
+            if ($mediaTrick->getType() === "image") {
+                FileManager::deleteFile(
+                    $this->getParameter("trick.folder"),
+                    $mediaTrick->getLink()
+                );
+            }
+
             $mediaTrick
                 ->setLink($link)
                 ->setAddedAt(new \DateTimeImmutable())
@@ -428,7 +628,9 @@ class TrickController extends AbstractController
         if ($form->get("isFeatured")->getData()) {
             $trick->setPictureFeatured($mediaTrick);
         } else {
-            $trick->addMediaTrick($mediaTrick);
+            if (!$mediaTrick->getId()) {
+                $trick->addMediaTrick($mediaTrick);
+            }
         }
 
         $this->em->flush();
@@ -437,24 +639,85 @@ class TrickController extends AbstractController
     }
 
     /**
+     * Function add media trick History
+     *
+     * @param FormInterface $form
+     * @param Trick $trick
+     *
+     * @return void
+     *
+     */
+    private function setMediaHistory(
+        FormInterface $form,
+        Trick $trick
+    ): void
+    {
+        $trickHistory = (new TrickHistory())
+            ->setTrick($trick)
+            ->setAuthor($this->getUser())
+            ->setUpdatedAt(new \DateTimeImmutable("now"));
+
+        if ($form->get("type")->getData() === "image") {
+            if ($form->get("isFeatured")->getData()) {
+                $trickHistory->setIsMediaFeatured(true);
+            }
+
+            if ($form->get("isEditMediaTrick")->getData()) {
+                $trickHistory->setIsMediaImageUpdated(true);
+            } else {
+                $trickHistory->setIsMediaImageAdded(true);
+            }
+        } else {
+            if ($form->get("isEditMediaTrick")->getData()) {
+                $trickHistory->setIsMediaVideoUpdated(true);
+            } else {
+                $trickHistory->setIsMediaVideoAdded(true);
+            }
+        }
+
+        $trick->setLastUpdatedAt(new \DateTimeImmutable("now"));
+
+        $this->em->persist($trickHistory);
+        $this->em->flush();
+
+    }
+
+    /**
      * Generate slug function
      *
-     * @param string $name
+     * @param Trick $trick
      *
      * @return string
+     *
+     * @throws NoResultException
+     * @throws NonUniqueResultException
      */
-    private function generateSlug(string $name): string
+    private function generateSlugTrick(Trick $trick): string
     {
-        $name = strtolower(preg_replace("/(é|è|ê|ë|É|È|Ê|Ë)/", "e", $name));
-        $name = strtolower(preg_replace("/(â|à|ä|ã|Â|À|Ä|Ã)/", "a", $name));
-        $name = strtolower(preg_replace("/(ï|î|ì|Ï|Î|Ì)/", "i", $name));
-        $name = strtolower(preg_replace("/(ù|ü|û|Ù|Û|Ü)/", "u", $name));
-        $name = strtolower(preg_replace("/(ô|ö|ò|õ|Ô|Ö|Ò|Õ)/", "o", $name));
-        $name = strtolower(preg_replace("/(ÿ)/", "y", $name));
-        $name = strtolower(preg_replace("/(ç|Ç)/", "c", $name));
-        $name = strtolower(preg_replace("/(\s|')/", "-", $name));
+        $slugBase = strtolower(preg_replace("/(é|è|ê|ë|É|È|Ê|Ë)/", "e", $trick->getName()));
+        $slugBase = strtolower(preg_replace("/(â|à|ä|ã|Â|À|Ä|Ã)/", "a", $slugBase));
+        $slugBase = strtolower(preg_replace("/(ï|î|ì|Ï|Î|Ì)/", "i", $slugBase));
+        $slugBase = strtolower(preg_replace("/(ù|ü|û|Ù|Û|Ü)/", "u", $slugBase));
+        $slugBase = strtolower(preg_replace("/(ô|ö|ò|õ|Ô|Ö|Ò|Õ)/", "o", $slugBase));
+        $slugBase = strtolower(preg_replace("/(ÿ)/", "y", $slugBase));
+        $slugBase = strtolower(preg_replace("/(ç|Ç)/", "c", $slugBase));
+        $slugBase = strtolower(preg_replace("/(\s|')/", "-", $slugBase));
+        $slugBase = strtolower(preg_replace("/[^a-zA-Z0-9\-]/", "", $slugBase));
 
-        return strtolower(preg_replace("/[^a-zA-Z0-9\-]/", "", $name));
+        $slug = $slugBase;
+        $count = 0;
+
+        while (
+            $this->trickRepository->getCountTricksBySlugNotEqualWithId(
+                $slug,
+                $trick->getId()
+            ) > 0
+        ) {
+            $slug = $slugBase . ($count > 0 ? "-" . $count : "");
+            $count++;
+        }
+
+        return $slug;
     }
 
 }
