@@ -73,20 +73,20 @@
                                     linkMedia = trick.pictureFeatured ?
                                     "tricks/" ~ trick.pictureFeatured.link :
                                     trick.mediaTricks|filter(media => media.type == "image")|length > 0 ?
-                                        "tricks/" ~ trick.mediaTricks[0].link :
+                                        "tricks/" ~ trick.mediaTricks|filter(media => media.type == "image")|first.link :
                                         "static/default-picture.png"
                                 %}
                                 <img src="{{ asset("assets/images/" ~ linkMedia) }}" class="card-img-top rounded-0" alt="...">
                                 <div class="card-body d-flex justify-content-between px-2 py-3">
                                     <div class="card-text">
-                                        <a class="link-primary" href="{{ path("app_trick_details", { 'slug': trick.slug }) }}">{{ trick.name }}</a>
+                                        <a class="link-primary" href="{{ path("app_trick_details", { "slug": trick.slug }) }}">{{ trick.name }}</a>
                                     </div>
                                     {% if is_granted("ROLE_USER") %}
                                     <div class="card-text d-flex flex-row flex-nowrap">
-                                        <a class="btn btn-primary btn-sm me-1" href="#">
+                                        <a class="btn btn-primary btn-sm me-1" href="{{ path("app_trick_edit", { "slug": trick.slug }) }}">
                                             <i class="fas fa-pen"></i>
                                         </a>
-                                        <a data-role=deleteTrick class="btn btn-danger btn-sm" href="{{ path("app_trick_delete", { 'slug': trick.slug } ) }}">
+                                        <a data-role=deleteTrick class="btn btn-danger btn-sm" href="{{ path("app_trick_delete", { "slug": trick.slug } ) }}">
                                             <i class="fas fa-trash"></i>
                                         </a>
                                     </div>
