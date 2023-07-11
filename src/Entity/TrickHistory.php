@@ -161,7 +161,7 @@ class TrickHistory
         return $this;
     }
 
-    public function IsMediaVideoAdded(): ?bool
+    public function isMediaVideoAdded(): ?bool
     {
         return $this->isMediaVideoAdded;
     }
