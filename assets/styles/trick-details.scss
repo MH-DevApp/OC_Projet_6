@@ -1,8 +1,13 @@
 #pictureFeaturedTrick {
-  img {
+  img, .default-image {
     object-position: center;
-    object-fit: contain;
-    max-height: calc(75vh - 100px);
+    width: 100%;
+    height: calc(75vh - 100px);
+  }
+
+  iframe {
+    width: 80vw !important;
+    height: calc(75vh - 100px);
   }
 }
 
@@ -11,6 +16,9 @@
 
   img {
     object-fit: cover;
+  }
+
+  img, .icon-image {
     height: 150px;
     width: 200px;
   }

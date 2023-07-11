@@ -1,7 +1,11 @@
-#pictureFeaturedTrick img {
+#pictureFeaturedTrick img, #pictureFeaturedTrick .default-image {
   object-position: center;
-  object-fit: contain;
-  max-height: calc(75vh - 100px);
+  width: 100%;
+  height: calc(75vh - 100px);
+}
+#pictureFeaturedTrick iframe {
+  width: 80vw !important;
+  height: calc(75vh - 100px);
 }
 
 #containerMedias {
@@ -9,6 +13,8 @@
 }
 #containerMedias img {
   object-fit: cover;
+}
+#containerMedias img, #containerMedias .icon-image {
   height: 150px;
   width: 200px;
 }
