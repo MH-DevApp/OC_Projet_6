@@ -22,7 +22,7 @@ class MediaTrick
     #[ORM\Column(length: 255)]
     private ?string $type = null;
 
-    #[ORM\Column(length: 255, unique: true)]
+    #[ORM\Column(length: 255)]
     private ?string $link = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -34,16 +34,8 @@ class MediaTrick
     #[ORM\Column]
     private ?\DateTimeImmutable $addedAt = null;
 
-    #[ORM\ManyToMany(targetEntity: TrickHistory::class, mappedBy: 'mediasTrick', cascade: ['persist'])]
-    private Collection $trickHistories;
-
     #[ORM\ManyToOne(cascade: ['persist'], inversedBy: 'mediaTricks')]
     private ?Trick $trick = null;
-
-    public function __construct()
-    {
-        $this->trickHistories = new ArrayCollection();
-    }
 
     public function getId(): ?UuidV6
     {
@@ -106,33 +98,6 @@ class MediaTrick
     public function setAddedAt(\DateTimeImmutable $addedAt): self
     {
         $this->addedAt = $addedAt;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, TrickHistory>
-     */
-    public function getTrickHistories(): Collection
-    {
-        return $this->trickHistories;
-    }
-
-    public function addTrickHistory(TrickHistory $trickHistory): self
-    {
-        if (!$this->trickHistories->contains($trickHistory)) {
-            $this->trickHistories->add($trickHistory);
-            $trickHistory->addMediasTrick($this);
-        }
-
-        return $this;
-    }
-
-    public function removeTrickHistory(TrickHistory $trickHistory): self
-    {
-        if ($this->trickHistories->removeElement($trickHistory)) {
-            $trickHistory->removeMediasTrick($this);
-        }
 
         return $this;
     }
