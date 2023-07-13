@@ -143,12 +143,12 @@
         {% if is_granted("ROLE_USER") %}
             <hr class="w-50 align-self-center">
             <div id="containerComments" class="d-flex flex-column flex-sm-row container align-items-center justify-content-center w-100 gap-2 p-3">
-                <div class="flex-fill ms-0 ms-sm-5">
-                    <input type="text" name="comment" id="comment" class="form-control">
-                </div>
+                {{ form_start(formComment) }}
+                {{ form_rest(formComment) }}
                 <div class="d-flex justify-content-center me-0 me-sm-5">
-                    <button type="button" class="btn btn-sm btn-primary">Ajouter un commentaire</button>
+                    <button type="submit" class="btn btn-sm btn-primary">Ajouter un commentaire</button>
                 </div>
+                {{ form_end(formComment) }}
             </div>
         {% endif %}
         <hr class="w-50 align-self-center">

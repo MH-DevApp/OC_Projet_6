@@ -2,9 +2,11 @@
 
 namespace App\Controller;
 
+use App\Entity\Comment;
 use App\Entity\MediaTrick;
 use App\Entity\Trick;
 use App\Entity\TrickHistory;
+use App\Form\CommentType;
 use App\Form\MediaTrickType;
 use App\Form\TrickFirstStepType;
 use App\Repository\TrickRepository;
@@ -259,12 +261,14 @@ class TrickController extends AbstractController
      * Details trick
      *
      * @param string $slug
+     * @param Request $request
      *
      * @return Response
      */
-    #[Route('/trick/details/{slug}', name: 'app_trick_details', methods: ['GET'])]
+    #[Route("/trick/details/{slug}", name: "app_trick_details", methods: ["GET", "POST"])]
     public function trickDetails(
-        string $slug
+        string $slug,
+        Request $request
     ): Response
     {
         $trick = $this->em->getRepository(Trick::class)->findOneBy([
@@ -276,8 +280,17 @@ class TrickController extends AbstractController
             throw $this->createNotFoundException();
         }
 
+        $comment = new Comment();
+        $formComment = $this->createForm(CommentType::class, $comment);
+        $formComment->handleRequest($request);
+
+        if ($formComment->isSubmitted() && $formComment->isValid()) {
+            dd($comment);
+        }
+
         return $this->render("trick/trick-details.html.twig", [
-            "trick" => $trick
+            "trick" => $trick,
+            "formComment" => $formComment->createView()
         ]);
     }
 
