@@ -471,7 +471,7 @@ class TrickController extends AbstractController
     }
 
     /**
-     * delete trick
+     * Delete trick
      *
      * @param string $slug
      *
@@ -508,6 +508,49 @@ class TrickController extends AbstractController
                 "home"
             )."#containerTricks"
         );
+    }
+
+    /**
+     * Delete comment
+     *
+     * @param string $id
+     *
+     * @return Response
+     */
+    #[Route('/comment/delete/{id}', name: 'app_comment_delete', methods: ['GET'])]
+    public function commentDeleteId(
+        string $id
+    ): Response
+    {
+        $this->denyAccessUnlessGranted("ROLE_USER");
+
+        $comment = $this->em->getRepository(Comment::class)->findOneBy([
+            "id" => $id
+        ]);
+
+        if (!$comment) {
+            throw $this->createNotFoundException();
+        }
+
+        if ($comment->getAuthor() !== $this->getUser()) {
+            $this->addFlash(
+                "danger",
+                "Vous ne pouvez pas supprimer ce commentaire."
+            );
+        } else {
+            $this->em->remove($comment);
+            $this->em->flush();
+
+            $this->addFlash(
+                "success",
+                "Le commentaire a été supprimé avec succès."
+            );
+        }
+
+        return $this->redirectToRoute("app_trick_details", [
+            "slug" => $comment->getTrick()->getSlug()
+        ]);
+
     }
 
     /**

@@ -174,7 +174,7 @@
                             {% if app.user == comment.author %}
                                 <div class="d-flex flex-row small">
                                     <a href="#" class="link-secondary">Modifier</a>,
-                                    <a href="#" class="link-danger ms-1">Supprimer</a>
+                                    <a href="{{ path("app_comment_delete",  { id: comment.id }) }}" class="link-danger ms-1">Supprimer</a>
                                 </div>
                             {% endif %}
                             <div class="d-flex align-items-center small fst-italic mt-1">
