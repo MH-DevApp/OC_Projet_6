@@ -143,18 +143,47 @@
         {% if is_granted("ROLE_USER") %}
             <hr class="w-50 align-self-center">
             <div id="containerComments" class="d-flex flex-column flex-sm-row container align-items-center justify-content-center w-100 gap-2 p-3">
-                <div class="flex-fill ms-0 ms-sm-5">
-                    <input type="text" name="comment" id="comment" class="form-control">
-                </div>
+                {{ form_start(formComment) }}
+                {{ form_rest(formComment) }}
                 <div class="d-flex justify-content-center me-0 me-sm-5">
-                    <button type="button" class="btn btn-sm btn-primary">Ajouter un commentaire</button>
+                    <button type="submit" class="btn btn-sm btn-primary">Ajouter un commentaire</button>
                 </div>
+                {{ form_end(formComment) }}
             </div>
         {% endif %}
         <hr class="w-50 align-self-center">
-        <div class="container d-flex flex-column align-items-center justify-content-center w-100 my-3">
+        <div class="container d-flex flex-column align-items-center justify-content-center my-3">
             {% if trick.comments|length %}
-
+                {% for comment in trick.comments %}
+                    <div class="d-flex flex-column justify-content-center align-content-center w-75 mb-3">
+                        <div class="d-flex justify-content-center shadow rounded p-0 p-lg-3">
+                            <div class="d-flex justify-content-center align-items-center p-1">
+                                {% if comment.author.picture %}
+                                    <img style="width: 50px; height: 50px;" class="rounded-circle p-2 d-flex align-items-center justify-content-center shadow bg-white text-white" src="{{ asset("assets/images/profiles/" ~ comment.author.picture) }}" alt="Image Avatar Author" />
+                                {% else %}
+                                    <div style="width: 50px; height: 50px;" class="rounded-circle p-2 d-flex align-items-center justify-content-center shadow bg-secondary text-white">
+                                        <span class="fs-1">{{ comment.author.username|first|upper }}</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="flex-fill d-flex justify-content-start align-items-center ms-2 ps-3 border-start border-secondary">
+                                <span>{{ comment.content }}</span>
+                            </div>
+                        </div>
+                        <div class="d-flex flex-row align-items-center {{ app.user == comment.author ? "justify-content-between" : "justify-content-end" }} w-100">
+                            {% if app.user == comment.author %}
+                                <div class="d-flex flex-row small">
+                                    <a href="#" class="link-secondary">Modifier</a>,
+                                    <a href="#" class="link-danger ms-1">Supprimer</a>
+                                </div>
+                            {% endif %}
+                            <div class="d-flex align-items-center small fst-italic mt-1">
+                                le <span class="mx-1"> {{ comment.createdAt|date("d/m/Y") }} </span> par
+                                <span class="badge bg-dark text-white mx-1">{{ comment.author.username|upper }}</span>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
             {% else %}
                 <p>
                     Aucun commentaire, soyez le premier !
