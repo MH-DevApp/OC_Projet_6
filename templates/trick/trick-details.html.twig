@@ -152,9 +152,25 @@
             </div>
         {% endif %}
         <hr class="w-50 align-self-center">
-        <div class="container d-flex flex-column align-items-center justify-content-center w-100 my-3">
+        <div class="container d-flex flex-column align-content-center justify-content-center my-3">
             {% if trick.comments|length %}
-
+                {% for comment in trick.comments %}
+                    <div class="d-flex justify-content-center align-content-center w-75">
+                        <div class="d-flex flex-column justify-content-center align-content-center bg-white p-1">
+                            {% if comment.author.picture %}
+                              <img src="{{ asset("assets/images/profiles/" ~ comment.author.picture) }}" alt="Image Avatar Author" />
+                            {% else %}
+                              <div style="width: 40px; height: 40px;" class="rounded-circle p-5 d-flex align-items-center justify-content-center bg-secondary text-white">
+                                <span class="fs-1">{{ comment.author.username|first|upper }}</span>
+                              </div>
+                            {% endif %}
+                            <span>{{ comment.author.username }}</span>
+                        </div>
+                        <div class="flex-fill d-flex justify-content-center align-content-center">
+                          <span>{{ comment.content }}</span>
+                        </div>
+                    </div>
+                {% endfor %}
             {% else %}
                 <p>
                     Aucun commentaire, soyez le premier !

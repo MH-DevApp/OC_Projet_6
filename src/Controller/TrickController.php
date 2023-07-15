@@ -285,7 +285,25 @@ class TrickController extends AbstractController
         $formComment->handleRequest($request);
 
         if ($formComment->isSubmitted() && $formComment->isValid()) {
-            dd($comment);
+            $this->denyAccessUnlessGranted("ROLE_USER");
+
+            $comment
+              ->setTrick($trick)
+              ->setAuthor($this->getUser())
+              ->setCreatedAt(new \DateTimeImmutable("now"));
+
+            $this->em->persist($comment);
+            $this->em->flush();
+
+            $this->addFlash(
+                "success",
+              "Commentaire ajouté avec succès."
+            );
+
+            return $this->redirectToRoute("app_trick_details", [
+                "slug" => $slug
+            ]);
+
         }
 
         return $this->render("trick/trick-details.html.twig", [
