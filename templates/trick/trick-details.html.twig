@@ -8,127 +8,22 @@
 
 {% block javascripts %}
     <script src="{{ asset("assets/scripts/details-trick.js") }}" type="module"></script>
+    {% if is_granted("ROLE_USER") %}
+        <script src="{{ asset("assets/scripts/comment.js") }}" type="module"></script>
+    {% endif %}
 {% endblock %}
 
 {% block body %}
     <div class="flex-fill d-flex flex-column">
-        <div data-trick-name="{{ trick.name }}" id="pictureFeaturedTrick" class="d-flex container position-relative p-0 justify-content-center w-100 h-100">
-            {% set linkFeatured = null %}
-            {% if trick.pictureFeatured == null %}
-                {% if trick.mediaTricks|filter(media => media.type == "image")|length > 0 %}
-                    {% set linkFeatured = "tricks/" ~ trick.mediaTricks|filter(media => media.type == "image")|first.link %}
-                {% endif %}
-            {% else %}
-                {% set linkFeatured = "tricks/" ~ trick.pictureFeatured.link %}
-            {% endif %}
-            <div data-show class="d-flex position-relative bg-dark bg-opacity-25">
-                {% if linkFeatured %}
-                    <img
-                            data-media="image"
-                            class="shadow w-100 p-1 bg-white"
-                            src="{{ asset("assets/images/" ~ linkFeatured) }}"
-                            alt="image de '{{ trick.pictureFeatured.sourceName ?? "Inconnu" }}' - {{ trick.name }}"
-                    />
-                    <div class="position-absolute bottom-0 w-100 h-100 d-flex align-items-end justify-content-center mb-5">
-                        <h1 class="title-trick-name bg-dark bg-opacity-75 text-white p-2 px-4">{{ trick.name }}</h1>
-                    </div>
-                    <div data-media-source class="{{ trick.pictureFeatured and trick.pictureFeatured.sourceName ? "d-flex" : "d-none"}} position-absolute start-0 bottom-0 w-100 p-1">
-                        <div class="d-flex w-100 gap-2 p-2 link-light bg-dark bg-opacity-75">
-                            <span>Source: </span>
-                            <a class="link-info" href="{{ trick.pictureFeatured.sourceLink ?? '#' }}">{{ trick.pictureFeatured.sourceName ?? "" }}</a>
-                        </div>
-                    </div>
-                {% elseif trick.mediaTricks|filter(media => media.type == "video")|length > 0 %}
-                    <iframe data-media="video" class="shadow p-1 bg-white" src="{{ trick.mediaTricks|filter(media => media.type == "video")|first.link }}" allowfullscreen></iframe>
-                {% else %}
-                    <div class="d-flex flex-column align-items-center default-image justify-content-center p-1 shadow">
-                        <i class="fas fa-image fs-1"></i>
-                        <span class="small">Aucune image</span>
-                    </div>
-                    <div class="position-absolute bottom-0 w-100 h-100 d-flex align-items-end justify-content-center mb-5">
-                        <h1 class="title-trick-name bg-dark bg-opacity-75 text-white p-2 px-4">{{ trick.name }}</h1>
-                    </div>
-                {% endif %}
-            </div>
 
-            {% if is_granted("ROLE_USER") %}
-                <div id="containerActions" class="position-absolute top-0 end-0 d-flex gap-2 bg-dark bg-opacity-75 flex-nowrap justify-content-center p-2 m-2">
-                    <a class="btn btn-primary btn-sm me-1" href="{{ path("app_trick_edit", { "slug": trick.slug } ) }}">
-                        <i class="fas fa-pen"></i>
-                    </a>
-                    <a data-role=deleteTrick class="btn btn-danger btn-sm" href="{{ path("app_trick_delete", { 'slug': trick.slug } ) }}">
-                        <i class="fas fa-trash"></i>
-                    </a>
-                </div>
-            {% endif %}
-        </div>
+        {% include "trick/components/media-show.html.twig" with { "trick": trick, "edit": false } %}
+
         <div class="d-flex justify-content-center mt-3">
             <button data-role=seeMedias type="button" class="d-block d-sm-none btn btn-sm btn-outline-primary">Voir les médias</button>
         </div>
-        <div id="containerMedias" class="d-none d-flex d-sm-flex flex-nowrap container w-100 justify-content-start gap-2 mt-3">
-            <div data-media-trick class="d-flex justify-content-center position-relative bg-white bg-opacity-50">
-                {% if trick.pictureFeatured %}
-                    <img
-                            data-media="image"
-                            class="shadow p-1 bg-warning bg-primary"
-                            src="{{ asset("assets/images/tricks/" ~ trick.pictureFeatured.link ) }}"
-                            alt="image de '{{ trick.pictureFeatured.sourceName ?? "Inconnu" }}' - {{ trick.name }}"
-                    />
-                    <div data-media-source class="{{ trick.pictureFeatured.sourceName ? "d-flex" : "d-none" }} position-absolute start-0 bottom-0 w-100 p-1">
-                        <div class="d-flex w-100 gap-2 p-2 link-light bg-dark bg-opacity-75">
-                            <span>Source: </span>
-                            <a class="link-info" href="{{ trick.pictureFeatured.sourceLink ?? '#' }}">{{ trick.pictureFeatured.sourceName ?? "" }}</a>
-                        </div>
-                    </div>
-                    <i class="fa-solid fa-bookmark position-absolute end-0 top-0 m-2 text-warning fs-2"></i>
-                {% else %}
-                    <div class="d-flex position-relative align-items-center justify-content-center icon-image p-1 shadow bg-warning">
-                        <div class="d-flex flex-column align-items-center justify-content-center bg-white w-100 h-100">
-                            <i class="fas fa-image fs-1"></i>
-                            <i class="fa-solid fa-bookmark position-absolute end-0 top-0 m-2 text-warning fs-2"></i>
-                            <span class="small">Aucune image mise en avant</span>
-                        </div>
-                    </div>
-                {% endif %}
-            </div>
-            {% for mediaTrick in trick.mediaTricks|filter(mediaTrick => mediaTrick.type == "image") %}
-                <div data-media-trick class="d-flex justify-content-center position-relative">
-                    <img
-                        data-media="image"
-                        class="shadow p-1 {{ loop.first and not trick.pictureFeatured ? "bg-primary" : "bg-white" }}"
-                        src="{{ asset("assets/images/tricks/" ~ mediaTrick.link ) }}"
-                        alt="image de '{{ mediaTrick.sourceName ?? "Inconnu" }}' - {{ trick.name }}"
-                    />
-                    <div data-media-source class="{{ mediaTrick.sourceName ? "d-flex" : "d-none" }} position-absolute start-0 bottom-0 w-100">
-                        <div class="d-flex w-100 gap-2 p-2 link-light bg-dark bg-opacity-75">
-                            <span>Source: </span>
-                            <a class="link-info" href="{{ mediaTrick.sourceLink ?? '#' }}">{{ mediaTrick.sourceName }}</a>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
-            {% for mediaTrick in trick.mediaTricks|filter(mediaTrick => mediaTrick.type == "video") %}
-                <div
-                    data-media-trick
-                    class="d-flex justify-content-center position-relative"
-                >
-                    <div
-                            data-media="video"
-                            data-video-link="{{ mediaTrick.link }}"
-                            class="d-flex align-items-center justify-content-center icon-image shadow p-1
-                            {{ loop.first and not trick.pictureFeatured and trick.mediaTricks|filter(mediaTrick => mediaTrick.type == "image")|length == 0 ?
-                                "bg-primary" :
-                                "bg-white"
-                            }}"
-                    >
-                        <div class="d-flex flex-column align-items-center justify-content-center bg-white w-100 h-100">
-                            <i class="fas fa-film fs-1"></i>
-                            <span class="small">Vidéo</span>
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
+
+        {% include "trick/components/container-medias.html.twig" with { "trick": trick, "edit": false } %}
+
         <div id="containerDescription" class="container d-flex w-100 gap-3 p-3">
             {{ trick.description|nl2br }}
         </div>
@@ -140,58 +35,11 @@
                 <span class="badge bg-dark text-white py-3 px-4">Modifié le : {{ trick.lastUpdatedAt|date("d/m/y") }}</span>
             {% endif %}
         </div>
+
+        {% include "trick/components/container-comments.html.twig" with { 'formComment': formComment } %}
+
         {% if is_granted("ROLE_USER") %}
-            <hr class="w-50 align-self-center">
-            <div id="containerComments" class="d-flex flex-column flex-sm-row container align-items-center justify-content-center w-100 gap-2 p-3">
-                {{ form_start(formComment) }}
-                {{ form_rest(formComment) }}
-                <div class="d-flex justify-content-center me-0 me-sm-5">
-                    <button type="submit" class="btn btn-sm btn-primary">Ajouter un commentaire</button>
-                </div>
-                {{ form_end(formComment) }}
-            </div>
+            {% include "trick/components/modal-form-edit-comment.html.twig" with { 'form': formEditComment } %}
         {% endif %}
-        <hr class="w-50 align-self-center">
-        <div class="container d-flex flex-column align-items-center justify-content-center my-3">
-            {% if trick.comments|length %}
-                {% for comment in trick.comments %}
-                    <div class="d-flex flex-column justify-content-center align-content-center w-75 mb-3">
-                        <div class="d-flex justify-content-center shadow rounded p-0 p-lg-3">
-                            <div class="d-flex justify-content-center align-items-center p-1">
-                                {% if comment.author.picture %}
-                                    <img style="width: 50px; height: 50px;" class="rounded-circle p-2 d-flex align-items-center justify-content-center shadow bg-white text-white" src="{{ asset("assets/images/profiles/" ~ comment.author.picture) }}" alt="Image Avatar Author" />
-                                {% else %}
-                                    <div style="width: 50px; height: 50px;" class="rounded-circle p-2 d-flex align-items-center justify-content-center shadow bg-secondary text-white">
-                                        <span class="fs-1">{{ comment.author.username|first|upper }}</span>
-                                    </div>
-                                {% endif %}
-                            </div>
-                            <div class="flex-fill d-flex justify-content-start align-items-center ms-2 ps-3 border-start border-secondary">
-                                <span>{{ comment.content }}</span>
-                            </div>
-                        </div>
-                        <div class="d-flex flex-row align-items-center {{ app.user == comment.author ? "justify-content-between" : "justify-content-end" }} w-100">
-                            {% if app.user == comment.author %}
-                                <div class="d-flex flex-row small">
-                                    <a href="#" class="link-secondary">Modifier</a>,
-                                    <a href="{{ path("app_comment_delete",  { id: comment.id }) }}" class="link-danger ms-1">Supprimer</a>
-                                </div>
-                            {% endif %}
-                            <div class="d-flex align-items-center small fst-italic mt-1">
-                                le <span class="mx-1"> {{ comment.createdAt|date("d/m/Y") }} </span> par
-                                <span class="badge bg-dark text-white mx-1">{{ comment.author.username|upper }}</span>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p>
-                    Aucun commentaire, soyez le premier !
-                    {% if not is_granted("ROLE_USER") %}
-                        <a href="{{ path("app_auth_login") }}" class="link-primary">Se connecter</a>
-                    {% endif %}
-                </p>
-            {% endif %}
-        </div>
     </div>
 {% endblock %}
