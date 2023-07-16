@@ -8,7 +8,9 @@
 
 {% block javascripts %}
     <script src="{{ asset("assets/scripts/details-trick.js") }}" type="module"></script>
-    <script src="{{ asset("assets/scripts/edit-comment.js") }}" type="module"></script>
+    {% if is_granted("ROLE_USER") %}
+        <script src="{{ asset("assets/scripts/comment.js") }}" type="module"></script>
+    {% endif %}
 {% endblock %}
 
 {% block body %}
@@ -175,7 +177,7 @@
                             {% if app.user == comment.author %}
                                 <div class="d-flex flex-row small">
                                     <button data-comment-id="{{ comment.id }}" data-role="comment-edit" type="button" class="btn btn-sm p-0 link-secondary" data-bs-toggle="modal" data-bs-target="#editCommentForm">Modifier</button>,
-                                    <a href="{{ path("app_comment_delete",  { id: comment.id }) }}" class="link-danger ms-1">Supprimer</a>
+                                    <a data-role="comment-delete" href="{{ path("app_comment_delete",  { id: comment.id }) }}" class="link-danger ms-1">Supprimer</a>
                                 </div>
                             {% endif %}
                             <div class="d-flex flex-column flex-sm-row align-items-center small fst-italic mt-1">

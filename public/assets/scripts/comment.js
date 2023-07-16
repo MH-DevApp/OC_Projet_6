@@ -2,6 +2,7 @@ import {constructModalConfirm} from "./utils/confirm.js";
 
 window.addEventListener("DOMContentLoaded", function() {
     const buttonsEditComment = document.querySelectorAll("button[data-role=comment-edit]");
+    const linksDeleteComment = document.querySelectorAll("a[data-role=comment-delete]");
 
     buttonsEditComment.forEach((button) => {
         button.addEventListener("click", () => {
@@ -16,6 +17,19 @@ window.addEventListener("DOMContentLoaded", function() {
                 inputCommentId.value = id;
             }
 
+        });
+    });
+
+    linksDeleteComment.forEach((link) => {
+        link.addEventListener("click", (event) => {
+            event.preventDefault();
+
+            constructModalConfirm(
+                "Êtes-vous sûr de vouloir supprimer ce commentaire ?",
+                () => {
+                    window.location.href = link.href;
+                }
+            ).show();
         });
     });
 });
