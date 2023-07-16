@@ -310,7 +310,7 @@ class TrickController extends AbstractController
         $formEditComment->add("commentEdited", TextType::class, [
             "label" => null,
             "row_attr" => [
-                "class" => "mb-3"
+                "class" => "d-none mb-3"
             ],
             "required" => false,
             "attr" => [
