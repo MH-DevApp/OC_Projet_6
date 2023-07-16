@@ -306,9 +306,53 @@ class TrickController extends AbstractController
 
         }
 
+        $formEditComment = $this->createForm(CommentType::class);
+        $formEditComment->add("commentEdited", TextType::class, [
+            "label" => null,
+            "row_attr" => [
+                "class" => "mb-3"
+            ],
+            "required" => false,
+            "attr" => [
+                "class" => "form-control"
+            ],
+            "mapped" => false
+        ]);
+        $formEditComment->handleRequest($request);
+
+        if ($formEditComment->isSubmitted() && $formEditComment->isValid()) {
+            $this->denyAccessUnlessGranted("ROLE_USER");
+
+            $commentEdited = $this->em->getRepository(Comment::class)->findOneBy([
+                "id" => $formEditComment->get("commentEdited")->getData(),
+            ]);
+
+            if ($commentEdited && $commentEdited->getAuthor() === $this->getUser()) {
+                $commentEdited->setContent($formEditComment->get("content")->getData());
+                $commentEdited->setUpdatedAt(new \DateTimeImmutable("now"));
+
+                $this->em->flush();
+
+                $this->addFlash(
+                    "success",
+                    "Commentaire modifié avec succès."
+                );
+
+                return $this->redirectToRoute("app_trick_details", [
+                    "slug" => $slug
+                ]);
+            } else {
+                $this->addFlash(
+                    "danger",
+                    "Action interdite."
+                );
+            }
+        }
+
         return $this->render("trick/trick-details.html.twig", [
             "trick" => $trick,
-            "formComment" => $formComment->createView()
+            "formComment" => $formComment->createView(),
+            "formEditComment" => $formEditComment->createView()
         ]);
     }
 
