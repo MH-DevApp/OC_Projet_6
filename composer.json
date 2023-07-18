@@ -74,6 +74,12 @@
             "cache:clear": "symfony-cmd",
             "assets:install %PUBLIC_DIR%": "symfony-cmd"
         },
+        "load": [
+            "symfony console d:d:d -f --env=dev",
+            "symfony console d:d:c --env=dev",
+            "symfony console d:s:u --complete -f --env=dev",
+            "symfony console d:f:l -n --env=dev"
+        ],
         "post-install-cmd": [
             "@auto-scripts"
         ],
