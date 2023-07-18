@@ -6,6 +6,12 @@
   object-position: center;
 }
 
+article img.card-img-top {
+  object-fit: cover;
+  object-position: center;
+  height: 150px;
+}
+
 #containerTricks {
   min-height: calc(100vh - 100px);
   margin-bottom: 100px;
