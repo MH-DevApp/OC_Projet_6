@@ -10,12 +10,7 @@ class GroupTrickFixture extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
-        $listGroupsTrick = [
-            "Grabs",
-            "Rotation",
-            "Flip",
-            "Slide/Jibs"
-        ];
+        $listGroupsTrick = json_decode(file_get_contents(__DIR__ . '/data/data-group-trick.json'), true);
 
         foreach ($listGroupsTrick as $group) {
             $groupTrick = new GroupTrick();
