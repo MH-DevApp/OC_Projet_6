@@ -27,7 +27,7 @@
         {% elseif trick.mediaTricks|filter(media => media.type == "video")|length > 0 %}
             <iframe data-media="video" class="shadow p-1 bg-white" src="{{ trick.mediaTricks|filter(media => media.type == "video")|first.link }}" allowfullscreen></iframe>
         {% else %}
-            <div class="d-flex flex-column align-items-center default-image justify-content-center p-1 shadow">
+            <div class="d-flex flex-column align-items-center default-image justify-content-center p-1 shadow w-100">
                 <i class="fas fa-image fs-1"></i>
                 <span class="small">Aucune image</span>
             </div>
