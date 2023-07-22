@@ -280,6 +280,20 @@ class TrickController extends AbstractController
             throw $this->createNotFoundException();
         }
 
+        $limit = $request->query->getInt("pageComments", 1) * 5;
+        $endOfComments = $limit >= $this->em->getRepository(Comment::class)->count(["trick" => $trick]);
+
+        $comments = $this->em->getRepository(Comment::class)->findBy(
+            [
+                "trick" => $trick
+            ],
+            [
+                "createdAt" => "DESC"
+            ],
+            $limit,
+            0
+        );
+
         $comment = new Comment();
         $formComment = $this->createForm(CommentType::class, $comment);
         $formComment->handleRequest($request);
@@ -351,6 +365,8 @@ class TrickController extends AbstractController
 
         return $this->render("trick/trick-details.html.twig", [
             "trick" => $trick,
+            "endOfComments" => $endOfComments,
+            "comments" => $comments,
             "formComment" => $formComment->createView(),
             "formEditComment" => $formEditComment->createView()
         ]);
@@ -361,7 +377,6 @@ class TrickController extends AbstractController
      *
      * @param string $slug
      * @param Request $request
-     * @param TrickRepository $trickRepository
      *
      * @return Response
      *
@@ -372,8 +387,7 @@ class TrickController extends AbstractController
     #[Route('/trick/edit/{slug}', name: 'app_trick_edit', methods: ['GET', 'POST'])]
     public function trickEdit(
         string $slug,
-        Request $request,
-        TrickRepository $trickRepository
+        Request $request
     ): Response
     {
         $this->denyAccessUnlessGranted("ROLE_USER");

@@ -56,46 +56,44 @@
                 </div>
             </div>
         </div>
-        <div class="position-absolute bottom-0 end-0 m-2 mb-5 p-2 px-3 bg-dark text-light rounded">
-            <a class="link-light" href="#containerTricks">
+        <div data-to-container-tricks class="position-absolute bottom-0 end-0 m-2 mb-5 p-2 px-3 bg-dark text-light rounded">
+            <a class="link-light" href="#">
                 <i class="fas fa-arrow-down"></i>
             </a>
         </div>
     </div>
-    <div id="containerTricks" class="container">
+    <div id="containerTricks" class="container mb-3 position-relative">
         <div class="row p-0 m-0 mt-2 h-100 w-100 justify-content-start align-items-center">
             {% if tricks|length %}
-{#                {% for index in range(0,14) %}#}
-                    {% for trick in tricks %}
-                        <div class="col-12 col-sm-4 col-lg-3 col-xl-2 mx-3 my-1 p-0">
-                            <article class="card d-flex rounded-0">
-                                {% set
-                                    linkMedia = trick.pictureFeatured ?
-                                    "tricks/" ~ trick.pictureFeatured.link :
-                                    trick.mediaTricks|filter(media => media.type == "image")|length > 0 ?
-                                        "tricks/" ~ trick.mediaTricks|filter(media => media.type == "image")|first.link :
-                                        "static/default-picture.png"
-                                %}
-                                <img src="{{ asset("assets/images/" ~ linkMedia) }}" class="card-img-top rounded-0" alt="...">
-                                <div class="card-body d-flex justify-content-between px-2 py-3">
-                                    <div class="card-text">
-                                        <a class="link-primary" href="{{ path("app_trick_details", { "slug": trick.slug }) }}">{{ trick.name }}</a>
-                                    </div>
-                                    {% if is_granted("ROLE_USER") %}
-                                    <div class="card-text d-flex flex-row flex-nowrap">
-                                        <a class="btn btn-primary btn-sm me-1" href="{{ path("app_trick_edit", { "slug": trick.slug }) }}">
-                                            <i class="fas fa-pen"></i>
-                                        </a>
-                                        <a data-role=deleteTrick class="btn btn-danger btn-sm" href="{{ path("app_trick_delete", { "slug": trick.slug } ) }}">
-                                            <i class="fas fa-trash"></i>
-                                        </a>
-                                    </div>
-                                    {% endif %}
+                {% for index, trick in tricks %}
+                    <div {{ app.request.query.get("page") and index == (app.request.query.get("page") - 1) * 15 ? "data-page-index" : "" }} class="col-12 col-sm-4 col-lg-3 col-xl-2 mx-3 my-1 p-0">
+                        <article class="card d-flex rounded-0">
+                            {% set
+                                linkMedia = trick.pictureFeatured ?
+                                "tricks/" ~ trick.pictureFeatured.link :
+                                trick.mediaTricks|filter(media => media.type == "image")|length > 0 ?
+                                    "tricks/" ~ trick.mediaTricks|filter(media => media.type == "image")|first.link :
+                                    "static/default-picture.png"
+                            %}
+                            <img src="{{ asset("assets/images/" ~ linkMedia) }}" class="card-img-top rounded-0" alt="...">
+                            <div class="card-body d-flex justify-content-between px-2 py-3">
+                                <div class="card-text">
+                                    <a class="link-primary" href="{{ path("app_trick_details", { "slug": trick.slug }) }}">{{ trick.name }}</a>
                                 </div>
-                            </article>
-                        </div>
-                    {% endfor %}
-{#                {% endfor %}#}
+                                {% if is_granted("ROLE_USER") %}
+                                <div class="card-text d-flex flex-row flex-nowrap">
+                                    <a class="btn btn-primary btn-sm me-1" href="{{ path("app_trick_edit", { "slug": trick.slug }) }}">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                    <a data-role=deleteTrick class="btn btn-danger btn-sm" href="{{ path("app_trick_delete", { "slug": trick.slug } ) }}">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </article>
+                    </div>
+                {% endfor %}
             {% else %}
                 <div class="col-12">
                     <p class="text-center">
@@ -105,5 +103,26 @@
                 </div>
             {% endif %}
         </div>
+        {% if app.request.query.get("page") %}
+            <div class="position-absolute row bottom-0 end-0 py-2 px-1 mb-5 me-3 bg-dark text-light rounded">
+                <a data-to-container-tricks class="link-light" href="#">
+                    <i class="fas fa-arrow-down" style="rotate: 180deg;"></i>
+                </a>
+            </div>
+        {% endif %}
+        {% if not endOfTricks %}
+            <div class="row p-0 m-0 mt-2 h-100 w-100 justify-content-center align-items-center my-3">
+                <div class="d-flex justify-content-center">
+                    <a
+                        class="btn btn-sm btn-primary"
+                        href="{{ path("home", {
+                            "page": app.request.query.get("page") ? app.request.query.get("page") + 1 : 2
+                        }) }}"
+                    >
+                        Voir plus
+                    </a>
+                </div>
+            </div>
+        {% endif %}
     </div>
 {% endblock %}

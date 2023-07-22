@@ -20,4 +20,22 @@ window.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    // Scroll to element current page
+    const elementPageIndex = document.querySelector("[data-page-index]");
+    if (elementPageIndex) {
+        window.scrollTo(elementPageIndex.offsetLeft, elementPageIndex.offsetTop + elementPageIndex.offsetHeight);
+    }
+
+    // Scroll to container tricks
+    const elementToContainerTricks = document.querySelectorAll("[data-to-container-tricks]");
+    if (elementToContainerTricks.length) {
+        const containerTricks = document.querySelector("#containerTricks");
+        elementToContainerTricks.forEach((element) => {
+            element.addEventListener("click", (event) => {
+                event.preventDefault();
+                window.scrollTo(containerTricks.offsetLeft, containerTricks.offsetTop - 100);
+            });
+        });
+    }
+
 });
