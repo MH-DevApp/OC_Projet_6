@@ -8,9 +8,7 @@
 
 {% block javascripts %}
     <script src="{{ asset("assets/scripts/details-trick.js") }}" type="module"></script>
-    {% if is_granted("ROLE_USER") %}
-        <script src="{{ asset("assets/scripts/comment.js") }}" type="module"></script>
-    {% endif %}
+    <script src="{{ asset("assets/scripts/comment.js") }}" type="module"></script>
 {% endblock %}
 
 {% block body %}
@@ -36,7 +34,7 @@
             {% endif %}
         </div>
 
-        {% include "trick/components/container-comments.html.twig" with { 'formComment': formComment } %}
+        {% include "trick/components/container-comments.html.twig" with { 'comments': comments, 'endOfComments': endOfComments, 'formComment': formComment } %}
 
         {% if is_granted("ROLE_USER") %}
             {% include "trick/components/modal-form-edit-comment.html.twig" with { 'form': formEditComment } %}

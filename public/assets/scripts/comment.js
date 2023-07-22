@@ -32,4 +32,10 @@ window.addEventListener("DOMContentLoaded", function() {
             ).show();
         });
     });
+
+    // Scroll to element current page
+    const elementPageIndex = document.querySelector("[data-page-index]");
+    if (elementPageIndex) {
+        window.scrollTo(elementPageIndex.offsetLeft, elementPageIndex.offsetTop + elementPageIndex.offsetHeight);
+    }
 });

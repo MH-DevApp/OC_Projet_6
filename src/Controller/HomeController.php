@@ -17,9 +17,8 @@ class HomeController extends AbstractController
         EntityManagerInterface $entityManager
     ): Response
     {
-        $countTricks = $entityManager->getRepository(Trick::class)->count([]);
-        $page = $request->query->getInt("page", 1);
-        $limit = $page * 15;
+        $limit = $request->query->getInt("page", 1) * 15;
+        $endOfTricks = $limit >= $entityManager->getRepository(Trick::class)->count([]);
         $tricks = $entityManager->getRepository(Trick::class)->findBy(
             [
                 "isPublished" => true
@@ -32,7 +31,7 @@ class HomeController extends AbstractController
 
         return $this->render("home/index.html.twig", [
             "tricks" => $tricks,
-            "endOfTricks" => ($page * 15) > $countTricks
+            "endOfTricks" => $endOfTricks
         ]);
     }
 }

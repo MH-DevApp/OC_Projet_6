@@ -11,9 +11,9 @@
 {% endif %}
 <hr class="w-50 align-self-center">
 <div id="containerComments" class="container d-flex flex-column align-items-center justify-content-center my-3">
-    {% if trick.comments|length %}
-        {% for comment in trick.comments %}
-            <div class="d-flex flex-column justify-content-center align-content-center w-75 mb-3">
+    {% if comments|length %}
+        {% for index,comment in comments %}
+            <div {{ app.request.query.get("pageComments") and index == (app.request.query.get("pageComments") - 1) * 5 ? "data-page-index" : "" }} class="d-flex flex-column justify-content-center align-content-center w-75 mb-3">
                 <div class="d-flex justify-content-center shadow rounded p-0 p-lg-3">
                     <div class="d-flex justify-content-center align-items-center p-1">
                         {% if comment.author.picture %}
@@ -47,6 +47,19 @@
                 </div>
             </div>
         {% endfor %}
+        {% if not endOfComments %}
+            <div class="d-flex justify-content-center">
+                <a
+                        class="btn btn-sm btn-primary"
+                        href="{{ path("app_trick_details", {
+                            "slug": trick.slug,
+                            "pageComments": app.request.query.get("pageComments") ? app.request.query.get("pageComments") + 1 : 2
+                        }) }}"
+                >
+                    Voir plus
+                </a>
+            </div>
+        {% endif %}
     {% else %}
         <p>
             Aucun commentaire, soyez le premier !
