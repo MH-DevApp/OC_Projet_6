@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Trick;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -12,19 +13,26 @@ class HomeController extends AbstractController
 {
     #[Route("/", name: "home", methods: ["GET"])]
     public function index(
+        Request $request,
         EntityManagerInterface $entityManager
     ): Response
     {
+        $countTricks = $entityManager->getRepository(Trick::class)->count([]);
+        $page = $request->query->getInt("page", 1);
+        $limit = $page * 15;
         $tricks = $entityManager->getRepository(Trick::class)->findBy(
             [
-                'isPublished' => true
+                "isPublished" => true
             ], [
-                'createdAt' => 'DESC'
-            ]
+                "createdAt" => "DESC"
+            ],
+            $limit,
+            0
         );
 
-        return $this->render('home/index.html.twig', [
-            "tricks" => $tricks
+        return $this->render("home/index.html.twig", [
+            "tricks" => $tricks,
+            "endOfTricks" => ($page * 15) > $countTricks
         ]);
     }
 }
