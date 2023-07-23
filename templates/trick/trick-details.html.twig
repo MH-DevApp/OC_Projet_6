@@ -9,6 +9,9 @@
 {% block javascripts %}
     <script src="{{ asset("assets/scripts/details-trick.js") }}" type="module"></script>
     <script src="{{ asset("assets/scripts/comment.js") }}" type="module"></script>
+    {% if histories|length %}
+        <script src="{{ asset("assets/scripts/histories.js") }}" type="module"></script>
+    {% endif %}
 {% endblock %}
 
 {% block body %}
@@ -16,28 +19,31 @@
 
         {% include "trick/components/media-show.html.twig" with { "trick": trick, "edit": false } %}
 
-        <div class="d-flex justify-content-center mt-3">
-            <button data-role=seeMedias type="button" class="d-block d-sm-none btn btn-sm btn-outline-primary">Voir les médias</button>
-        </div>
-
         {% include "trick/components/container-medias.html.twig" with { "trick": trick, "edit": false } %}
 
         <div id="containerDescription" class="container d-flex w-100 gap-3 p-3">
             {{ trick.description|nl2br }}
         </div>
-        <div id="containerInfos" class="container d-flex flex-wrap justify-content-center w-100 gap-3 p-3">
+        <div id="containerInfos" class="container d-flex flex-wrap justify-content-center align-items-center w-100 gap-3 p-3">
             <span class="badge bg-dark text-white py-3 px-4">Créé le : {{ trick.createdAt|date("d/m/y") }}</span>
             <span class="badge bg-dark text-white py-3 px-4">Auteur : {{ trick.author.username }}</span>
             <span class="badge bg-dark text-white py-3 px-4">Groupe : {{ trick.groupTrick }}</span>
             {% if trick.lastUpdatedAt %}
                 <span class="badge bg-dark text-white py-3 px-4">Modifié le : {{ trick.lastUpdatedAt|date("d/m/y") }}</span>
             {% endif %}
+            {% if histories|length %}
+                <span class="d-none d-sm-flex badge bg-warning text-dark" style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#modalHistories">
+                    <i class="fas fa-clock-rotate-left fs-3 px-1 py-1"></i>
+                </span>
+            {% endif %}
         </div>
 
-        {% include "trick/components/container-comments.html.twig" with { 'comments': comments, 'endOfComments': endOfComments, 'formComment': formComment } %}
+        {% include "trick/components/container-comments.html.twig" with { "comments": comments, "endOfComments": endOfComments, "formComment": formComment } %}
 
         {% if is_granted("ROLE_USER") %}
-            {% include "trick/components/modal-form-edit-comment.html.twig" with { 'form': formEditComment } %}
+            {% include "trick/components/modal-form-edit-comment.html.twig" with { "form": formEditComment } %}
         {% endif %}
+
+        {% include "trick/components/modal-histories.html.twig" with { "histories": histories, "endOfTrickHistories": endOfTrickHistories } %}
     </div>
 {% endblock %}

@@ -27,7 +27,11 @@
 
 {% block body %}
     <div class="flex-fill d-flex flex-column">
-        <div id="containerActions" class="d-flex justify-content-start container p-3 w-100">
+        <div id="containerActions" class="d-flex justify-content-between container p-3 w-100">
+            <a class="btn btn-primary btn-sm" href="{{ path("app_trick_details", { 'slug': trick.slug } ) }}">
+                <i class="fas fa-arrow-left"></i>
+                Voir le détails
+            </a>
             <a data-role=deleteTrick class="btn btn-danger btn-sm" href="{{ path("app_trick_delete", { 'slug': trick.slug } ) }}">
                 <i class="fas fa-trash"></i>
                 Supprimer la figure
