@@ -280,17 +280,23 @@ class TrickController extends AbstractController
             throw $this->createNotFoundException();
         }
 
-        $limit = $request->query->getInt("pageComments", 1) * 5;
-        $endOfComments = $limit >= $this->em->getRepository(Comment::class)->count(["trick" => $trick]);
+        $limitPageComments = $request->query->getInt("pageComments", 1) * 5;
+        $endOfComments = $limitPageComments >= $this->em->getRepository(Comment::class)->count(["trick" => $trick]);
 
         $comments = $this->em->getRepository(Comment::class)->findBy(
-            [
-                "trick" => $trick
-            ],
-            [
-                "createdAt" => "DESC"
-            ],
-            $limit,
+            [ "trick" => $trick ],
+            [ "createdAt" => "DESC" ],
+            $limitPageComments,
+            0
+        );
+
+        $limitPageTrickHistories = $request->query->getInt("pageHistories", 1) * 5;
+        $endOfTrickHistories = $limitPageTrickHistories >= $this->em->getRepository(TrickHistory::class)->count(["trick" => $trick]);
+
+        $trickHistories = $this->em->getRepository(TrickHistory::class)->findBy(
+            [ "trick" => $trick ],
+            [ "updatedAt" => "DESC" ],
+            $limitPageTrickHistories,
             0
         );
 
@@ -367,6 +373,8 @@ class TrickController extends AbstractController
             "trick" => $trick,
             "endOfComments" => $endOfComments,
             "comments" => $comments,
+            "histories" => $trickHistories,
+            "endOfTrickHistories" => $endOfTrickHistories,
             "formComment" => $formComment->createView(),
             "formEditComment" => $formEditComment->createView()
         ]);
