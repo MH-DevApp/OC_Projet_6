@@ -37,7 +37,7 @@ class TrickFixture extends Fixture implements DependentFixtureInterface
                     ->setIsPublished(true)
                     ->setDescription($dataTrick['description'])
                     ->setGroupTrick($groupTrick)
-                    ->setCreatedAt(new \DateTimeImmutable("-".rand(0, 365)." days"));
+                    ->setCreatedAt(new \DateTimeImmutable("-".rand(20, 365)." days"));
 
                 if (isset($dataTrick["featuredMedia"]) && $dataTrick["featuredMedia"]) {
                     $media = new MediaTrick();
