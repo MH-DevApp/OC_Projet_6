@@ -1,5 +1,6 @@
 version: '3.8'
 
+name: "p6"
 services:
   db:
     container_name: db
@@ -27,6 +28,7 @@ services:
       PMA_HOST: db
 
   php:
+    container_name: php
     build:
       context: .
       dockerfile: Dockerfile.php
