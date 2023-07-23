@@ -26,6 +26,25 @@ services:
     environment:
       PMA_HOST: db
 
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile.php
+    volumes:
+      - type: volume
+        source: tls
+        target: /root/.symfony/certs
+      - type: bind
+        source: .
+        target: /app
+      - type: volume
+        target: /app/vendor
+    depends_on:
+      - db
+      - mailer
+    ports:
+      - "3000:8000"
+
   mailer:
     container_name: mailer
     image: "schickling/mailcatcher"
@@ -36,3 +55,4 @@ services:
 volumes:
   oc_dev:
     external: true
+  tls:
