@@ -1,0 +1,33 @@
+#pictureFeaturedTrick img, #pictureFeaturedTrick .default-image {
+  object-position: center;
+  width: 100%;
+  height: calc(75vh - 100px);
+}
+#pictureFeaturedTrick iframe {
+  width: 80vw !important;
+  height: calc(75vh - 100px);
+}
+
+#containerMedias {
+  overflow-x: auto;
+}
+#containerMedias img {
+  object-fit: cover;
+}
+#containerMedias img, #containerMedias .icon-image {
+  height: 150px;
+  width: 200px;
+}
+#containerMedias iframe {
+  height: 150px;
+  width: 200px;
+}
+#containerMedias [data-media-trick] {
+  cursor: pointer;
+}
+
+#containerDescription {
+  text-align: justify;
+}
+
+/*# sourceMappingURL=trick-details.css.map */

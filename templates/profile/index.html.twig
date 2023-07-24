@@ -1,0 +1,101 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profil {{ app.user.username|capitalize }}{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('assets/styles/profile.css') }}">
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset("assets/scripts/profile.js") }}" type="module"></script>
+{% endblock %}
+
+{% block body %}
+    <div class="flex-fill d-flex flex-column justify-content-center">
+        <div class="row m-0 my-3 p-0 justify-content-center">
+            <div class="col-12 col-sm-10 col-lg-8 col-xl-6 col-xxl-5">
+                <div class="d-none justify-content-center">
+                    {{ form_start(formAvatar) }}
+                    {{ form_rest(formAvatar) }}
+                    {{ form_end(formAvatar) }}
+                </div>
+                <div class="d-flex justify-content-center">
+                    <div class="avatar position-relative">
+                        {% if app.user.picture %}
+                            <img src="{{ asset("assets/images/profiles/" ~ app.user.picture) }}" alt="Image Avatar User" />
+                        {% else %}
+                            <div class="h-100 w-100 rounded-circle d-flex align-items-center justify-content-center bg-secondary">
+                                <span class="avatar-letter">{{ app.user.username|first|upper }}</span>
+                            </div>
+                        {% endif %}
+                        <div class="avatar-overflow">
+                            <div class="d-flex gap-3 w-100 p-2 bg-white justify-content-center align-items-center small">
+                                <button id="avatar_edit" class="btn btn-dark btn-sm">
+                                    <i class="fas fa-pen"></i>
+                                </button>
+                                {% if app.user.picture %}
+                                    <button id="avatar_delete" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% if formAvatar.avatar.vars.errors|length %}
+                    <div class="d-flex justify-content-center mt-2">
+                        {% for error in formAvatar.avatar.vars.errors %}
+                            <small class="form-error text-center">* {{ error.message }}</small>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="row m-0 mb-3 p-0 justify-content-center">
+            <div class="col-12 col-sm-10 col-lg-8 col-xl-6 col-xxl-5">
+                <h2 class="bg-primary-1 m-0 p-2 ps-3 text-decoration-underline rounded-top border-bottom border-secondary fs-3">Informations personnelles</h2>
+                <div id="containerFormInfos" class="d-{{ formInfos.vars.submitted ? 'flex' : 'none' }} justify-content-center">
+                    {{ form_start(formInfos) }}
+                    {{ form_rest(formInfos) }}
+                    <div class="d-flex gap-2 justify-content-end align-items-center">
+                        <input id="btnCancelFormInfos" class="btn btn-outline-danger" type="button" value="Annuler" />
+                        <input class="btn btn-primary" type="submit" value="Enregistrer" />
+                    </div>
+                    {{ form_end(formInfos) }}
+                </div>
+                <div id="containerShowInfos" class="d-flex justify-content-center">
+                    <div class="d-{{ formInfos.vars.submitted ? 'none' : 'flex' }} flex-column w-100 shadow p-3 rounded">
+                        <div class="d-flex flex-column">
+                            <p class="form-label">Email</p>
+                            <p data-field="email" class="w-100 border form-control rounded">
+                                {{ app.user.email }}
+                            </p>
+                        </div>
+                        <div class="d-flex flex-column">
+                            <p class="form-label">Nom d'utilisateur</p>
+                            <p data-field="username" class="w-100 border form-control rounded">
+                                {{ app.user.username|capitalize }}
+                            </p>
+                        </div>
+                        <div class="d-flex justify-content-end align-items-center">
+                            <input id="btnUpdateInfos" class="btn btn-primary" type="button" value="Modifier" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row m-0 mb-3 p-0 justify-content-center">
+            <div class="col-12 col-sm-10 col-lg-8 col-xl-6 col-xxl-5">
+                <h2 class="bg-primary-1 m-0 p-2 ps-3 text-decoration-underline rounded-top border-bottom border-secondary fs-3">Modifier le mot de passe</h2>
+                <div class="d-flex justify-content-center">
+                    {{ form_start(formResetPassword) }}
+                    {{ form_rest(formResetPassword) }}
+                    <div class="d-flex justify-content-end align-items-center">
+                        <input class="btn btn-primary" type="submit" value="Modifier" />
+                    </div>
+                    {{ form_end(formResetPassword) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

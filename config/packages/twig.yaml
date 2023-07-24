@@ -1,0 +1,9 @@
+twig:
+    default_path: '%kernel.project_dir%/templates'
+    form_themes: ['bundles/Theme/Form/base_form_theme.html.twig']
+    date:
+        timezone: Europe/Paris
+
+when@test:
+    twig:
+        strict_variables: true

@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Recupérer un nouveau lien de confirmation de votre email{% endblock %}
+
+{% block body %}
+    <div class="flex-fill d-flex flex-column justify-content-center">
+        <h2 class="text-center text-uppercase text-decoration-underline mb-4">Activation de votre adresse email</h2>
+        <div class="row m-0 p-0 justify-content-center">
+            <div class="col-12 col-sm-10 col-lg-8 col-xl-6 col-xxl-5">
+                <div class="d-flex justify-content-center">
+                    {{ form_start(form) }}
+                    {{ form_rest(form) }}
+                    <div class="d-flex justify-content-end align-items-center">
+                        <input class="btn btn-primary" type="submit" value="Envoyer" />
+                    </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

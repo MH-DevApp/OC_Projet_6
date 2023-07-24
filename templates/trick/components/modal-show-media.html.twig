@@ -1,0 +1,17 @@
+<button id="btnShowModalMedia" type="button" class="d-none" data-bs-toggle="modal" data-bs-target="#modalShowMedia">
+    <i class="fas {{ trick.pictureFeatured ? "fa-pen" : "fa-circle-plus" }}"></i>
+    Mise en avant
+</button>
+<div class="modal modal-lg fade" id="modalShowMedia" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalShowMedia" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary-1">
+                <h1>{{ trick.name }}</h1>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body h-auto">
+
+            </div>
+        </div>
+    </div>
+</div>

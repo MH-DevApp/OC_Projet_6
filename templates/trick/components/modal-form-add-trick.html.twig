@@ -1,0 +1,39 @@
+
+<div class="modal modal-lg fade" id="mediaForm" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="mediaForm" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary-1">
+                <h1 class="modal-title fs-5"></h1>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row m-0 p-0 justify-content-center">
+                    <div class="col-12 col-lg-10 col-xxl-8">
+                        <div class="d-flex justify-content-center align-items-center">
+                            {{ form_start(form) }}
+                            {{ form_row(form.type) }}
+                            {{ form_row(form.imageFile) }}
+                            <div class="d-flex flex-column mb-3">
+                                <div class="d-flex justify-content-between">
+                                    {{ form_label(form.linkMovie) }}
+                                    <i id="infoLinkMovie" class="fas fa-circle-info text-info fs-4"></i>
+                                </div>
+                                {{ form_widget(form.linkMovie) }}
+                                {{ form_errors(form.linkMovie) }}
+                            </div>
+
+                            {{ form_row(form.sourceName) }}
+                            {{ form_row(form.sourceLink) }}
+                            {{ form_rest(form) }}
+                            <div class="d-flex justify-content-between align-items-center">
+                                <button type="button" class="btn btn-outline-danger"  data-bs-dismiss="modal" aria-label="Close">Fermer</button>
+                                <input class="btn btn-primary" type="submit" value="Ajouter" />
+                            </div>
+                            {{ form_end(form) }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

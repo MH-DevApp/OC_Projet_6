@@ -1,0 +1,5 @@
+framework:
+    mailer:
+        dsn: '%env(MAILER_DSN)%'
+        headers:
+            from: 'OC DAPS P6 <no-reply@p6-daps-oc.fr>'

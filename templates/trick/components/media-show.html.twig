@@ -1,0 +1,50 @@
+<div data-trick-name="{{ trick.name }}" id="pictureFeaturedTrick" class="d-flex container position-relative p-0 justify-content-center w-100 h-100">
+    {% set linkFeatured = null %}
+    {% if trick.pictureFeatured == null %}
+        {% if trick.mediaTricks|filter(media => media.type == "image")|length > 0 %}
+            {% set linkFeatured = "tricks/" ~ trick.mediaTricks|filter(media => media.type == "image")|first.link %}
+        {% endif %}
+    {% else %}
+        {% set linkFeatured = "tricks/" ~ trick.pictureFeatured.link %}
+    {% endif %}
+    <div data-show class="d-flex position-relative bg-dark bg-opacity-25">
+        {% if linkFeatured %}
+            <img
+                    data-media="image"
+                    class="shadow w-100 p-1 bg-white"
+                    src="{{ asset("assets/images/" ~ linkFeatured) }}"
+                    alt="image de '{{ trick.pictureFeatured.sourceName ?? "Inconnu" }}' - {{ trick.name }}"
+            />
+            <div class="position-absolute bottom-0 w-100 h-100 d-flex align-items-end justify-content-center mb-5">
+                <h1 class="title-trick-name bg-dark bg-opacity-75 text-white p-2 px-4">{{ trick.name }}</h1>
+            </div>
+            <div data-media-source class="{{ trick.pictureFeatured and trick.pictureFeatured.sourceName ? "d-flex" : "d-none"}} position-absolute start-0 bottom-0 w-100 p-1">
+                <div class="d-flex w-100 gap-2 p-2 link-light bg-dark bg-opacity-75">
+                    <span>Source: </span>
+                    <a class="link-info" href="{{ trick.pictureFeatured.sourceLink ?? '#' }}">{{ trick.pictureFeatured.sourceName ?? "" }}</a>
+                </div>
+            </div>
+        {% elseif trick.mediaTricks|filter(media => media.type == "video")|length > 0 %}
+            <iframe data-media="video" class="shadow p-1 bg-white" src="{{ trick.mediaTricks|filter(media => media.type == "video")|first.link }}" allowfullscreen></iframe>
+        {% else %}
+            <div class="d-flex flex-column align-items-center default-image justify-content-center p-1 shadow w-100">
+                <i class="fas fa-image fs-1"></i>
+                <span class="small">Aucune image</span>
+            </div>
+            <div class="position-absolute bottom-0 w-100 h-100 d-flex align-items-end justify-content-center mb-5">
+                <h1 class="title-trick-name bg-dark bg-opacity-75 text-white p-2 px-4">{{ trick.name }}</h1>
+            </div>
+        {% endif %}
+    </div>
+
+    {% if is_granted("ROLE_USER") and edit == false %}
+        <div id="containerActions" class="position-absolute top-0 end-0 d-flex gap-2 bg-dark bg-opacity-75 flex-nowrap justify-content-center p-2 m-2">
+            <a class="btn btn-primary btn-sm me-1" href="{{ path("app_trick_edit", { "slug": trick.slug } ) }}">
+                <i class="fas fa-pen"></i>
+            </a>
+            <a data-role=deleteTrick class="btn btn-danger btn-sm" href="{{ path("app_trick_delete", { 'slug': trick.slug } ) }}">
+                <i class="fas fa-trash"></i>
+            </a>
+        </div>
+    {% endif %}
+</div>

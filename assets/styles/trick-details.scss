@@ -1,0 +1,38 @@
+#pictureFeaturedTrick {
+  img, .default-image {
+    object-position: center;
+    width: 100%;
+    height: calc(75vh - 100px);
+  }
+
+  iframe {
+    width: 80vw !important;
+    height: calc(75vh - 100px);
+  }
+}
+
+#containerMedias {
+  overflow-x: auto;
+
+  img {
+    object-fit: cover;
+  }
+
+  img, .icon-image {
+    height: 150px;
+    width: 200px;
+  }
+
+  iframe {
+    height: 150px;
+    width: 200px;
+  }
+
+  [data-media-trick] {
+    cursor: pointer;
+  }
+}
+
+#containerDescription {
+  text-align: justify;
+}

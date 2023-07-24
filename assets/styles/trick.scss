@@ -1,0 +1,19 @@
+i#infoLinkMovie {
+    cursor: pointer;
+}
+
+div#modalInfoLinkMovie {
+    z-index: 10000;
+}
+
+[data-role=showMedia] {
+    cursor: pointer;
+}
+
+[data-media-trick] [data-actions] {
+    display: none;
+}
+
+[data-media-trick]:hover [data-actions] {
+    display: flex;
+}

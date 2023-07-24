@@ -1,0 +1,99 @@
+<div class="modal modal-lg fade" id="modalHistories" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="modalHistories" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary-1">
+                <h1 class="modal-title fs-5">Historique</h1>
+                {% if app.request.query.get("pageComments") %}
+                    <a class="btn-close btn-close-white" href="{{ path("app_trick_details", { "slug": trick.slug, "pageComments": app.request.query.get("pageComments") } ) }}"></a>
+                {% else %}
+                    <a class="btn-close btn-close-white" href="{{ path("app_trick_details", { "slug": trick.slug } ) }}"></a>
+                {% endif %}
+            </div>
+            <div class="modal-body d-flex flex-column align-items-center w-100">
+                {% for index, history in histories %}
+                    {% set message = history.author.username|upper ~ " " %}
+                    {% if history.isMediaFeatured %}
+                        {% if history.isMediaImageAdded %}
+                            {% set message = message ~ "a ajouté une image de mise en avant." %}
+                        {% elseif history.isMediaImageUpdated %}
+                            {% set message = message ~ "a modifié l'image de mise en avant." %}
+                        {% elseif history.isMediaImageDeleted %}
+                            {% set message = message ~ "a supprimé l'image de mise en avant." %}
+                        {% endif %}
+                    {% elseif history.isMediaImageAdded %}
+                        {% set message = message ~ "a ajouté une image dans la bibliothèque." %}
+                    {% elseif history.isMediaImageUpdated %}
+                        {% set message = message ~ "a modifié une image de la bibliothèque." %}
+                    {% elseif history.isMediaImageDeleted %}
+                        {% set message = message ~ "a supprimé une image de la bibliothèque." %}
+                    {% elseif history.isMediaVideoAdded %}
+                        {% set message = message ~ "a ajouté une vidéo dans la bibliothèque." %}
+                    {% elseif history.isMediaVideoUpdated %}
+                        {% set message = message ~ "a modifié une vidéo de la bibliothèque." %}
+                    {% elseif history.isMediaVideoDeleted %}
+                        {% set message = message ~ "a supprimé une vidéo de la bibliothèque." %}
+                    {% elseif history.isNameUpdated or history.isDescriptionUpdated or history.isGroupTrickUpdated %}
+                        {% set elementsUpdated = [] %}
+                        {% if history.isNameUpdated %}
+                            {% set elementsUpdated = elementsUpdated|merge("le nom") %}
+                        {% elseif history.isDescriptionUpdated %}
+                            {% set elementsUpdated = elementsUpdated|merge("la description") %}
+                        {% elseif history.isGroupTrickUpdated %}
+                            {% set elementsUpdated = elementsUpdated|merge("le groupe") %}
+                        {% endif %}
+                        {% set message = message ~ " a modifié " ~ elementsUpdated|join(", ", " et ") ~ "." %}
+                    {% endif %}
+                    <div {{ app.request.query.get("pageHistories") and index == (app.request.query.get("pageHistories") - 1) * 5 ? "data-page-histories-index" : "" }} class="d-flex flex-column justify-content-center align-content-center w-75 mb-3">
+                        <div class="d-flex justify-content-center shadow rounded p-0 p-lg-3">
+                            <div class="d-flex justify-content-center align-items-center p-1">
+                                {% if history.author.picture %}
+                                    <img style="width: 50px; height: 50px;" class="rounded-circle p-2 d-flex align-items-center justify-content-center shadow bg-white text-white" src="{{ asset("assets/images/profiles/" ~ history.author.picture) }}" alt="Image Avatar Author" />
+                                {% else %}
+                                    <div style="width: 50px; height: 50px;" class="rounded-circle p-2 d-flex align-items-center justify-content-center shadow bg-secondary text-white">
+                                        <span class="fs-1">{{ history.author.username|first|upper }}</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="flex-fill d-flex justify-content-start align-items-center ms-2 ps-3 border-start border-secondary">
+                                <span>{{ message }}</span>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end w-100">
+                            <div class="d-flex justify-content-center small fst-italic mt-1">
+                                <p class="m-0">
+                                    le <span class="mx-1 small">{{ history.updatedAt|date("d/m/Y à H\\hi") }}</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+                {% if not endOfTrickHistories %}
+                    <div class="d-flex justify-content-center">
+                        {% if app.request.query.get("pageComments") %}
+                            <a
+                                    class="btn btn-sm btn-primary"
+                                    href="{{ path("app_trick_details", {
+                                        "slug": trick.slug,
+                                        "pageComments": app.request.query.get("pageComments") ?? 1,
+                                        "pageHistories": app.request.query.get("pageHistories") ? app.request.query.get("pageHistories") + 1 : 2
+                                    }) }}"
+                            >
+                                Voir plus
+                            </a>
+                        {% else %}
+                            <a
+                                    class="btn btn-sm btn-primary"
+                                    href="{{ path("app_trick_details", {
+                                        "slug": trick.slug,
+                                        "pageHistories": app.request.query.get("pageHistories") ? app.request.query.get("pageHistories") + 1 : 2
+                                    }) }}"
+                            >
+                                Voir plus
+                            </a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

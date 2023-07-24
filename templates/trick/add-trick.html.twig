@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Ajouter une figure{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset("assets/scripts/add-trick.js") }}" type="module"></script>
+{% endblock %}
+
+{% block body %}
+    <div class="flex-fill d-flex flex-column justify-content-center">
+        <h2 class="d-flex flex-column align-items-center text-uppercase mb-4">
+            <span class="text-decoration-underline">Ajouter une figure</span>
+        </h2>
+        <div class="row m-0 p-0 justify-content-center">
+            <div class="col-12 col-sm-10 col-lg-8 col-xl-6 col-xxl-5">
+                <div class="d-flex justify-content-center">
+                    {{ form_start(form) }}
+                    {{ form_rest(form) }}
+                    <div class="d-flex justify-content-{{ isCreated ? 'between' : 'end' }} align-items-center">
+                        {% if isCreated %}
+                            <a id="linkCancelTrick" class="d-none" href="{{ path("app_trick_cancel_add_trick") }}">Annuler</a>
+                            <button type="button" id="btnCancelTrick" class="btn btn-outline-danger">Annuler</button>
+                        {% endif %}
+                        <input class="btn btn-primary" type="submit" value="Suivant" />
+                    </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

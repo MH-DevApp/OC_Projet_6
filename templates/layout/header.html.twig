@@ -1,0 +1,66 @@
+<header>
+    <nav class="d-none d-sm-flex navbar flex-nowrap fixed-top">
+        <div class="container-fluid align-items-end">
+            <a class="navbar-brand fs-1" href="{{ path("home") }}">
+                <img src="{{ asset("/assets/images/static/brand.jpg") }}" alt="Brand image" class="d-inline-block align-text-bottom">
+                Snowtricks
+            </a>
+            <div class="d-flex flex-nowrap gap-2 pb-2">
+                <a class="link-light" href="{{ path("home") }}">
+                    <i class="fa-solid fa-house"></i>
+                    <span class="ps-1">Accueil</span>
+                </a>
+                <span class="text-light">|</span>
+                <a class="link-light" href="{{ path("app_trick_add") }}">
+                    <i class="fa-solid fa-circle-plus"></i>
+                    <span class="ps-1">Figure</span>
+                </a>
+                <span class="text-light">|</span>
+                {% if app.user %}
+                    <a class="link-light" href="{{ path('app_profile') }}">
+                        <i class="fa-solid fa-address-card"></i>
+                        <span class="ps-1">Profil</span>
+                    </a>
+                    <span class="text-light">|</span>
+                    <a class="link-light" href="{{ path('app_auth_logout') }}">
+                        <i class="fa-solid fa-right-to-bracket" style="rotate: -180deg"></i>
+                        <span class="ps-1">Se déconnecter</span>
+                    </a>
+                {% else %}
+                    <a class="link-light" href="{{ path('app_auth_register') }}">
+                        <i class="fa-solid fa-user-plus"></i>
+                        <span class="ps-1">Inscription</span>
+                    </a>
+                    <span class="text-light">|</span>
+                    <a class="link-light" href="{{ path('app_auth_login') }}">
+                        <i class="fa-solid fa-right-to-bracket"></i>
+                        <span class="ps-1">Se connecter</span>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    <nav class="d-flex d-sm-none justify-content-evenly align-items-center fixed-bottom">
+        <a class="link-light" href="{{ path("home") }}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Accueil">
+            <i class="fa-solid fa-house"></i>
+        </a>
+        <a class="link-light" href="{{ path("app_trick_add") }}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Ajouter une figure">
+            <i class="fa-solid fa-circle-plus"></i>
+        </a>
+        {% if app.user %}
+            <a class="link-light" href="{{ path('app_profile') }}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Profil">
+                <i class="fa-solid fa-address-card"></i>
+            </a>
+            <a class="link-light" href="{{ path("app_auth_logout") }}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Se déconnecter">
+                <i class="fa-solid fa-right-to-bracket" style="rotate: -180deg"></i>
+            </a>
+        {% else %}
+            <a class="link-light" href="{{ path('app_auth_register') }}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Inscription">
+                <i class="fa-solid fa-user-plus"></i>
+            </a>
+            <a class="link-light" href="{{ path('app_auth_login') }}" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Se connecter">
+                <i class="fa-solid fa-right-to-bracket"></i>
+            </a>
+        {% endif %}
+    </nav>
+</header>

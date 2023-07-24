@@ -1,0 +1,8 @@
+{
+  "scripts": {
+    "sass": "sass --watch assets/styles:public/assets/styles"
+  },
+  "dependencies": {
+    "sass": "^1.63.3"
+  }
+}
