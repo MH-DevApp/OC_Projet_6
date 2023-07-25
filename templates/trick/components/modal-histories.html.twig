@@ -35,11 +35,13 @@
                     {% elseif history.isNameUpdated or history.isDescriptionUpdated or history.isGroupTrickUpdated %}
                         {% set elementsUpdated = [] %}
                         {% if history.isNameUpdated %}
-                            {% set elementsUpdated = elementsUpdated|merge("le nom") %}
-                        {% elseif history.isDescriptionUpdated %}
-                            {% set elementsUpdated = elementsUpdated|merge("la description") %}
-                        {% elseif history.isGroupTrickUpdated %}
-                            {% set elementsUpdated = elementsUpdated|merge("le groupe") %}
+                            {% set elementsUpdated = elementsUpdated|merge(["le nom"]) %}
+                        {% endif %}
+                        {% if history.isDescriptionUpdated %}
+                            {% set elementsUpdated = elementsUpdated|merge(["la description"]) %}
+                        {% endif %}
+                        {% if history.isGroupTrickUpdated %}
+                            {% set elementsUpdated = elementsUpdated|merge(["le groupe"]) %}
                         {% endif %}
                         {% set message = message ~ " a modifié " ~ elementsUpdated|join(", ", " et ") ~ "." %}
                     {% endif %}
